@@ -1,14 +1,31 @@
 import pg from 'pg';
 import { createCoreProvider } from './core.mjs';
-import { martEntities } from './model.mjs';
+import { entities, martEntities } from './model.mjs';
 import { InputError } from './analytics.mjs';
+import { createSqlExplorer } from './sql-explorer.mjs';
 
 // All filtering uses parameters. Buyer state is NOT seller state.
 export function createMartProvider(connectionString) {
   if (!connectionString) throw new Error('Для DATA_SOURCE=mart требуется DATABASE_URL.');
-  const pool = new pg.Pool({ connectionString, max: 3, connectionTimeoutMillis: 5000 });
+  const pool = new pg.Pool({ connectionString, max: 3, connectionTimeoutMillis: 15000 });
   let details;
-  return {
+  const explorer = createSqlExplorer(pool);
+  const cached = (fn, ttl) => {
+    const entries = new Map();
+    return (...args) => {
+      const key = JSON.stringify(args), now = Date.now(), previous = entries.get(key);
+      if (previous && (previous.pending || now < previous.expires)) return previous.promise;
+      if (entries.size >= 32) {
+        for (const [oldKey, entry] of entries) if (!entry.pending) { entries.delete(oldKey); break; }
+      }
+      const entry = {pending:true,expires:0};
+      entry.promise = Promise.resolve().then(() => fn(...args)).then(value => {
+        entry.pending=false; entry.expires=Date.now()+ttl; return value;
+      }).catch(error => { entries.delete(key); throw error; });
+      entries.set(key,entry); return entry.promise;
+    };
+  };
+  const provider = {
     async getOverview(filters) {
       const client = await pool.connect();
       const args = [`${filters.start}-01`, `${filters.end}-01`, filters.state];
@@ -68,6 +85,18 @@ export function createMartProvider(connectionString) {
       details ??= createCoreProvider(connectionString);
       return details.getData();
     },
+    async getCoreModel() {
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
+        await client.query("SET LOCAL statement_timeout = '5000ms'");
+        const result = await client.query(entities.map(e =>
+          `SELECT '${e.id}' AS id, count(*)::int AS count FROM core.${e.id}`).join(' UNION ALL '));
+        await client.query('COMMIT');
+        return { counts: Object.fromEntries(result.rows.map(r => [r.id, r.count])), loadedAt: new Date().toISOString() };
+      } catch (error) { await client.query('ROLLBACK').catch(() => {}); throw error; }
+      finally { client.release(); }
+    },
     async getMartModel() {
       const client = await pool.connect();
       try {
@@ -86,5 +115,13 @@ export function createMartProvider(connectionString) {
       finally { client.release(); }
     },
     close: async () => { await pool.end(); if (details) await details.close(); },
+  };
+  return { ...provider,
+    getOverview: cached(provider.getOverview, 60000),
+    getCoreModel: cached(provider.getCoreModel, 600000),
+    getMartModel: cached(provider.getMartModel, 600000),
+    getOrders: cached(explorer.getOrders, 30000),
+    getOrderDetail: cached(explorer.getOrderDetail, 600000),
+    getQuality: cached(explorer.getQuality, 600000),
   };
 }

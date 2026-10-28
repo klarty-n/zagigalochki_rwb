@@ -46,19 +46,27 @@ export function createApp(provider, source, access = {}) {
   };
   app.get('/api/orders', handle(async (req, res) => {
     const query = parseOrderQuery(req.query);
+    if (provider.getOrders) return res.json(await provider.getOrders(query));
     const data = await provider.getData();
     if (query.state !== 'all' && !data.orders.some(o => o.state === query.state)) throw new InputError('Штат отсутствует в данных.');
     res.json(listOrders(data, query));
   }));
   app.get('/api/orders/:id', handle(async (req, res) => {
     if (!/^[A-Za-z0-9_-]{1,100}$/.test(req.params.id)) throw new InputError('Некорректный ID заказа.');
-    const result = orderDetail(await provider.getData(), req.params.id);
+    const result = provider.getOrderDetail ? await provider.getOrderDetail(req.params.id) : orderDetail(await provider.getData(), req.params.id);
     if (!result) return res.status(404).json({ error: 'Заказ не найден в текущем источнике.' });
     res.json(result);
   }));
-  app.get('/api/quality', handle(async (_req, res) => res.json(inspectQuality(await provider.getData()))));
+  app.get('/api/quality', handle(async (_req, res) => res.json(provider.getQuality ? await provider.getQuality() : inspectQuality(await provider.getData()))));
   app.get('/api/model', handle(async (_req, res) => {
     // The documented schema remains usable when the database is offline; counts do not.
+    if (provider.getCoreModel) {
+      const [coreStats, marts] = await Promise.all([
+        provider.getCoreModel().catch(() => null),
+        provider.getMartModel().catch(() => null),
+      ]);
+      return res.json(modelPayload(null, source, marts, coreStats));
+    }
     const data = await provider.getData().catch(() => null);
     const marts = provider.getMartModel ? await provider.getMartModel().catch(() => null) : null;
     res.json(modelPayload(data, source, marts));

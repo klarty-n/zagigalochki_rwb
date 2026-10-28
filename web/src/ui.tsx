@@ -16,10 +16,11 @@ export function useApi<T>(url: string, revision = 0) {
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     const abort = new AbortController(); setLoading(true); setError('');
+    const timeout = setTimeout(() => abort.abort(new Error('Источник данных отвечает слишком долго. Попробуйте обновить страницу.')), 45000);
     fetch(url, { signal: abort.signal }).then(async r => { const body = await r.json(); if (!r.ok) throw new Error(body.error || 'Не удалось загрузить данные.'); return body as T; })
-      .then(setData).catch(e => { if (e.name !== 'AbortError') setError(e.message); })
-      .finally(() => { if (!abort.signal.aborted) setLoading(false); });
-    return () => abort.abort();
+      .then(setData).catch(e => { if (e.name !== 'AbortError') setError(e instanceof TypeError ? 'Нет связи с сервером. Повторите запрос.' : e.message); })
+      .finally(() => { clearTimeout(timeout); if (!abort.signal.aborted || abort.signal.reason?.name !== 'AbortError') setLoading(false); });
+    return () => { clearTimeout(timeout); abort.abort(); };
   }, [url, revision, attempt]);
   return { data, loading, error, retry: () => setAttempt(a => a + 1) };
 }

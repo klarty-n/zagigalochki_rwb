@@ -54,17 +54,17 @@ export const martEntities = [
   {id:'sales_kpis',title:'Показатели продаж',grain:'Один общий итог доставленных заказов с товарами',key:'Одна итоговая строка',
    note:'Выручка, средний чек, среднее количество строк и единиц в заказе.',inputs:['mart.order_metrics']},
 ];
-export function modelPayload(data, source, marts = null) {
+export function modelPayload(data, source, marts = null, coreStats = null) {
 
-  const counts = data ? {
+  const counts = coreStats?.counts ?? (data ? {
     orders: data.orders.length, customers: data.sourceCounts?.customers ?? new Set(data.orders.map(o => o.customerId ?? o.id)).size,
     order_items: data.orders.reduce((n, o) => n + o.items.length, 0),
     order_payments: data.orders.reduce((n, o) => n + (o.payments?.length ?? 0), 0),
     order_reviews: data.orders.reduce((n, o) => n + (o.reviews?.length ?? 0), 0),
     products: data.products?.length ?? new Set(data.orders.flatMap(o => o.items.map(i => i.productId))).size,
     sellers: data.sellers.length, categories: data.categories.filter(c => c.id !== null).length,
-  } : {};
-  return { source, available: !!data, loadedAt: data?.loadedAt ?? null, contract: 'core + mart · PostgreSQL 16',
+  } : {});
+  return { source, available: !!data || !!coreStats, loadedAt: coreStats?.loadedAt ?? data?.loadedAt ?? null, contract: 'core + mart · PostgreSQL 16',
     martAvailable: marts !== null,
     marts: martEntities.map(e => ({...e,raw:'',fields:marts?.fields[e.id] ?? [],count:marts?.counts[e.id] ?? null})),
     martRelations: martEntities.flatMap(e => e.inputs.map(input => ({from:input,to:`mart.${e.id}`,label:'SQL-зависимость',cardinality:'VIEW'}))),
