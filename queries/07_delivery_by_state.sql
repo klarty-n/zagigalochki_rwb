@@ -10,7 +10,7 @@ WITH deliveries AS (
                 THEN o.delivered_customer_at::date > o.estimated_delivery_date
            END AS is_late
     FROM core.orders o
-    JOIN core.customers c USING (customer_id)
+    LEFT JOIN core.order_address_snapshot c USING (order_id)
     WHERE o.order_status = 'delivered'
 )
 SELECT COALESCE(state, 'Не указан') AS state,

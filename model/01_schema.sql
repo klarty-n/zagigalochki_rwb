@@ -110,8 +110,16 @@ GROUP BY i.seller_id, i.product_id, p.category_name
 ON CONFLICT DO NOTHING;
 
 INSERT INTO core.order_item_category_snapshot(order_id, order_item_id, category_name)
-SELECT i.order_id, i.order_item_id, p.category_name
-FROM core.order_items i JOIN core.products p USING(product_id)
+SELECT i.order_id, i.order_item_id,
+       CASE WHEN h.valid_from IS NOT NULL THEN h.category_name ELSE p.category_name END
+FROM core.order_items i JOIN core.orders o USING(order_id)
+JOIN core.products p USING(product_id)
+LEFT JOIN LATERAL (
+ SELECT category_name,valid_from FROM core.seller_product_category_history h
+ WHERE h.seller_id=i.seller_id AND h.product_id=i.product_id
+ AND h.valid_from<=o.order_purchase_at AND (h.valid_to IS NULL OR o.order_purchase_at<h.valid_to)
+ ORDER BY h.valid_from DESC LIMIT 1
+) h ON true
 ON CONFLICT (order_id, order_item_id) DO NOTHING;
 
 -- Called for future category-change events; event time must be supplied by source.
@@ -174,3 +182,28 @@ END $$;
 DROP TRIGGER IF EXISTS capture_order_item_category ON core.order_items;
 CREATE TRIGGER capture_order_item_category AFTER INSERT ON core.order_items
 FOR EACH ROW EXECUTE FUNCTION core.capture_order_item_category();
+
+-- Database-enforced non-overlap, including direct INSERT/UPDATE outside the event API.
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+DO $$ BEGIN
+ IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid='core.seller_product_category_history'::regclass
+                AND conname='offer_category_no_overlap') THEN
+  ALTER TABLE core.seller_product_category_history ADD CONSTRAINT offer_category_no_overlap
+  EXCLUDE USING gist (seller_id WITH =, product_id WITH =,
+                     tsrange(valid_from,valid_to,'[)') WITH &&);
+ END IF;
+END $$;
+
+CREATE OR REPLACE FUNCTION core.protect_order_snapshot() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+ IF TG_OP='DELETE' OR NEW IS DISTINCT FROM OLD THEN
+  RAISE EXCEPTION 'Historical order snapshots are immutable' USING ERRCODE='23514';
+ END IF;
+ RETURN NEW;
+END $$;
+DROP TRIGGER IF EXISTS immutable_order_address ON core.order_address_snapshot;
+CREATE TRIGGER immutable_order_address BEFORE UPDATE OR DELETE ON core.order_address_snapshot
+FOR EACH ROW EXECUTE FUNCTION core.protect_order_snapshot();
+DROP TRIGGER IF EXISTS immutable_item_category ON core.order_item_category_snapshot;
+CREATE TRIGGER immutable_item_category BEFORE UPDATE OR DELETE ON core.order_item_category_snapshot
+FOR EACH ROW EXECUTE FUNCTION core.protect_order_snapshot();

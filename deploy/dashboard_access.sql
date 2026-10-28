@@ -22,6 +22,6 @@ GRANT SELECT ON mart.order_metrics,mart.delivered_items TO dashboard_api;
 GRANT USAGE ON SCHEMA core TO dashboard_api;
 GRANT SELECT ON core.orders,core.customers,core.order_items,core.order_payments,
  core.order_reviews,core.products,core.sellers,core.categories,
- core.order_address_snapshot,core.order_item_category_snapshot TO dashboard_api;
+ core.order_address_snapshot,core.order_item_category_snapshot,core.seller_product_category_history TO dashboard_api;
 GRANT SELECT ON mart.customer_purchases TO dashboard_api;
 COMMIT;

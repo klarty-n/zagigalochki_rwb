@@ -75,8 +75,9 @@ export function modelPayload(data, source, marts = null) {
     order_payments: data.orders.reduce((n, o) => n + (o.payments?.length ?? 0), 0),
     order_reviews: data.orders.reduce((n, o) => n + (o.reviews?.length ?? 0), 0),
     products: data.products?.length ?? new Set(data.orders.flatMap(o => o.items.map(i => i.productId))).size,
-    order_address_snapshot: data.orders.length,
-    order_item_category_snapshot: data.orders.reduce((n, o) => n + o.items.length, 0),
+    order_address_snapshot: data.sourceCounts?.order_address_snapshot ?? null,
+    order_item_category_snapshot: data.sourceCounts?.order_item_category_snapshot ?? null,
+    seller_product_category_history: data.sourceCounts?.seller_product_category_history ?? null,
     sellers: data.sellers.length, categories: data.categories.filter(c => c.id !== null).length,
   } : {};
   return { source, available: !!data, loadedAt: data?.loadedAt ?? null, contract: 'core + mart · PostgreSQL 16',

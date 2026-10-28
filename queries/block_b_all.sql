@@ -29,7 +29,7 @@ WITH deliveries AS (
                 THEN o.delivered_customer_at::date > o.estimated_delivery_date
            END AS is_late
     FROM core.orders o
-    JOIN core.customers c USING (customer_id)
+    LEFT JOIN core.order_address_snapshot c USING (order_id)
     WHERE o.order_status = 'delivered'
 )
 SELECT COALESCE(state, 'Не указан') AS state,
@@ -61,7 +61,7 @@ SELECT COALESCE(c.state,'Не указан') AS state,
        ROUND(AVG(p.payment_installments), 2) AS average_installments
 FROM core.order_payments p
 JOIN core.orders o USING (order_id)
-JOIN core.customers c USING (customer_id)
+LEFT JOIN core.order_address_snapshot c USING (order_id)
 WHERE o.order_purchase_at >= timestamp '2018-01-01'
   AND o.order_purchase_at < timestamp '2019-01-01'
 GROUP BY c.state

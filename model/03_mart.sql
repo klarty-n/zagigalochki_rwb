@@ -19,7 +19,7 @@ SELECT o.order_id, c.customer_unique_id, o.order_status, o.order_purchase_at,
  COALESCE(i.item_lines,0::bigint) AS item_lines,
  i.order_id IS NOT NULL AS has_items, addr.state AS buyer_state
 FROM core.orders o JOIN core.customers c USING(customer_id)
-JOIN core.order_address_snapshot addr USING(order_id)
+LEFT JOIN core.order_address_snapshot addr USING(order_id)
 LEFT JOIN items i USING(order_id);
 
 -- Grain: one delivered unit. Do not join payments or reviews directly here.
@@ -31,8 +31,8 @@ SELECT i.order_id, i.order_item_id, i.product_id, i.seller_id,
  snap.category_name AS category_code,
  COALESCE(NULLIF(btrim(c.category_name_english),''),snap.category_name,'Не указана') AS category, addr.state AS buyer_state
 FROM core.order_items i JOIN core.orders o USING(order_id)
-JOIN core.order_address_snapshot addr USING(order_id)
-JOIN core.order_item_category_snapshot snap USING(order_id,order_item_id)
+LEFT JOIN core.order_address_snapshot addr USING(order_id)
+LEFT JOIN core.order_item_category_snapshot snap USING(order_id,order_item_id)
 JOIN core.sellers s USING(seller_id)
 JOIN core.products p USING(product_id)
 LEFT JOIN core.categories c ON c.category_name=snap.category_name

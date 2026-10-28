@@ -23,7 +23,7 @@ export function createCoreProvider(connectionString) {
                to_char(o.estimated_delivery_date, 'YYYY-MM-DD') AS estimated_at
         FROM core.orders o
         JOIN core.customers c ON c.customer_id = o.customer_id
-        JOIN core.order_address_snapshot addr ON addr.order_id = o.order_id
+        LEFT JOIN core.order_address_snapshot addr ON addr.order_id = o.order_id
       `);
       const items = await client.query(`
         SELECT i.order_id, i.order_item_id, i.product_id, i.seller_id, snap.category_name AS category_id,
@@ -31,7 +31,7 @@ export function createCoreProvider(connectionString) {
                (i.price * 100)::bigint AS price_cents,
                (i.freight_value * 100)::bigint AS freight_cents
         FROM core.order_items i
-        JOIN core.order_item_category_snapshot snap
+        LEFT JOIN core.order_item_category_snapshot snap
           ON snap.order_id=i.order_id AND snap.order_item_id=i.order_item_id
       `);
       const sellers = await client.query('SELECT seller_id AS id, city, state FROM core.sellers');
@@ -44,7 +44,10 @@ export function createCoreProvider(connectionString) {
         comment_title AS title, comment_message AS message,
         to_char(review_created_at, 'YYYY-MM-DD"T"HH24:MI:SS') AS created_at,
         to_char(review_answered_at, 'YYYY-MM-DD"T"HH24:MI:SS') AS answered_at FROM core.order_reviews`);
-      const counts = await client.query('SELECT count(*)::int AS customers FROM core.customers');
+      const counts = await client.query(`SELECT (SELECT count(*)::int FROM core.customers) AS customers,
+        (SELECT count(*)::int FROM core.order_address_snapshot) AS order_address_snapshot,
+        (SELECT count(*)::int FROM core.order_item_category_snapshot) AS order_item_category_snapshot,
+        (SELECT count(*)::int FROM core.seller_product_category_history) AS seller_product_category_history`);
       await client.query('COMMIT');
       const byOrder = new Map(orders.rows.map(o => [o.id, {
         id: o.id, purchasedAt: o.purchased_at, status: o.status, buyerId: o.buyer_id, customerId: o.customer_id,

@@ -26,7 +26,7 @@ def query(sql):
 def main():
     out=ROOT/'results/block_b';out.mkdir(exist_ok=True,parents=True)
     report={'status':'running','source':'core','checked_at_utc':datetime.now(timezone.utc).isoformat(),
-            'checks':[],'history_migration_verified':False}
+            'checks':[],'history_structure_verified':False, 'history_note':'Snapshot coverage is tested here; behavioral history test is checks/history.sql'}
     results={}; texts={}; checks=report['checks']
     def check(name,condition):
         checks.append({'name':name,'passed':bool(condition)})
@@ -36,6 +36,11 @@ def main():
         for name in NAMES:
             sql=(ROOT/'queries'/f'{name}.sql').read_text()
             text,rows=query(sql);results[name]=rows;texts[name]=text
+        check('Every order has an address snapshot',total('SELECT COUNT(*) FROM core.order_address_snapshot;')==total('SELECT COUNT(*) FROM core.orders;'))
+        check('Every item has a category snapshot',total('SELECT COUNT(*) FROM core.order_item_category_snapshot;')==total('SELECT COUNT(*) FROM core.order_items;'))
+        check('Category intervals cannot overlap',total("SELECT COUNT(*) FROM pg_constraint WHERE conrelid='core.seller_product_category_history'::regclass AND conname='offer_category_no_overlap';")==1)
+        check('Both historical snapshots protected',total("SELECT COUNT(*) FROM pg_trigger WHERE NOT tgisinternal AND tgenabled<>'D' AND tgname IN ('immutable_order_address','immutable_item_category');")==2)
+        report['history_structure_verified']=True
         price=results[NAMES[0]];state=results[NAMES[1]];funnel=results[NAMES[2]]
         payments=results[NAMES[3]];methods=results[NAMES[4]];scores=results[NAMES[5]]
         selection=query("""SELECT i.product_id,COUNT(DISTINCT i.price) AS prices,COUNT(*) AS units
@@ -47,7 +52,7 @@ def main():
         check('Q6 date-price pairs unique',len({(r['sale_date'],r['price']) for r in price})==len(price))
         check('Q7 states unique and >=500',len({r['state'] for r in state})==len(state) and all(int(r['orders'])>=500 for r in state))
         check('Q7 eligible order count',sum(int(r['orders']) for r in state)==total("""SELECT COALESCE(SUM(n),0) FROM (
-          SELECT COUNT(*) n FROM core.orders o JOIN core.customers c USING(customer_id)
+          SELECT COUNT(*) n FROM core.orders o JOIN core.order_address_snapshot c USING(order_id)
           WHERE order_status='delivered' GROUP BY c.state HAVING COUNT(*)>=500) q;"""))
         check('Q8 all orders preserved',sum(int(r['orders']) for r in funnel)==total('SELECT COUNT(*) FROM core.orders;'))
         check('Q8 no-item count independently reconciled',sum(int(r['orders_without_items']) for r in funnel)==total(

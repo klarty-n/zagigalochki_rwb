@@ -12,6 +12,7 @@ def main():
 BEGIN;
 CREATE TEMP TABLE test_orders(order_id text,customer_id text,order_status text,order_purchase_at timestamp,
  delivered_customer_at timestamp,estimated_delivery_date date);
+CREATE TEMP TABLE test_order_address_snapshot(order_id text,state text);
 CREATE TEMP TABLE test_customers(customer_id text,state text);
 CREATE TEMP TABLE test_order_items(order_id text,product_id text,seller_id text,price numeric);
 CREATE TEMP TABLE test_order_payments(order_id text,payment_type text,payment_value numeric,payment_installments int);
@@ -26,6 +27,7 @@ INSERT INTO test_orders VALUES
  ('f','b','shipped','2017-01-01',NULL,NULL);
 INSERT INTO test_orders SELECT 'x'||g,'x','delivered','2018-01-01','2018-01-06','2018-01-03' FROM generate_series(1,499) g;
 INSERT INTO test_orders SELECT 'y'||g,'y','delivered','2018-01-01 12:00','2018-01-03 12:00','2018-01-03' FROM generate_series(1,500) g;
+INSERT INTO test_order_address_snapshot SELECT o.order_id,c.state FROM test_orders o JOIN test_customers c USING(customer_id);
 INSERT INTO test_order_items VALUES ('a','p1','s1',10),('a','p1','s1',10),('b','p1','s2',20),('d','p2','s1',8),('e','p3','s1',0);
 INSERT INTO test_order_payments VALUES ('a','credit_card',15,2),('a','voucher',5,1),('c','credit_card',7,0),('f','voucher',9,1);
 INSERT INTO test_order_reviews VALUES
@@ -39,7 +41,7 @@ INSERT INTO test_order_reviews VALUES
         for name in names:
             sql=(ROOT/'queries'/f'{name}.sql').read_text()
             sql='\n'.join(line for line in sql.splitlines() if not line.lstrip().startswith('--')).strip().rstrip(';')
-            for table in ['orders','customers','order_items','order_payments','order_reviews']:
+            for table in ['order_address_snapshot','orders','customers','order_items','order_payments','order_reviews']:
                 sql=sql.replace('core.'+table,'pg_temp.test_'+table)
             script+=f"\\copy ({' '.join(sql.splitlines())}) TO '{temp}/{name}.csv' WITH CSV HEADER\n"
         script+='ROLLBACK;\n'

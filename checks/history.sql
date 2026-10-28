@@ -36,6 +36,13 @@ BEGIN
             changed_at+interval '1 day',10.00,1.00);
     UPDATE core.customers SET city='New city',state='RJ'
     WHERE customer_id='__history_test_customer__';
+    INSERT INTO core.customers(customer_id,customer_unique_id,zip_code_prefix,city,state)
+    SELECT '__history_test_customer_moved__',customer_unique_id,zip_code_prefix,city,state
+    FROM core.customers WHERE customer_id='__history_test_customer__';
+    INSERT INTO core.orders(order_id,customer_id,order_status,order_purchase_at)
+    VALUES('__history_test_order_moved__','__history_test_customer_moved__','created',changed_at+interval '2 seconds');
+    SELECT state INTO result_state FROM core.order_address_snapshot WHERE order_id='__history_test_order_moved__';
+    IF result_state <> 'RJ' THEN RAISE EXCEPTION 'New order does not capture new address'; END IF;
     UPDATE core.products SET category_name=new_category WHERE product_id=old_item.product_id;
 
     SELECT category_name INTO result_category FROM core.order_item_category_snapshot
@@ -53,6 +60,20 @@ BEGIN
     SELECT state INTO result_state FROM core.order_address_snapshot
     WHERE order_id='__history_test_order__';
     IF result_state <> 'SP' THEN RAISE EXCEPTION 'New order address changed after move'; END IF;
+    BEGIN
+      INSERT INTO core.seller_product_category_history(seller_id,product_id,valid_from,valid_to,category_name)
+      VALUES(old_item.seller_id,old_item.product_id,changed_at-interval '1 second',changed_at+interval '1 second',new_category);
+      RAISE EXCEPTION 'Overlapping category periods were accepted';
+    EXCEPTION WHEN exclusion_violation THEN NULL; END;
+    BEGIN
+      UPDATE core.order_address_snapshot SET state='ZZ' WHERE order_id=old_item.order_id;
+      RAISE EXCEPTION 'Address snapshot mutation was accepted';
+    EXCEPTION WHEN check_violation THEN NULL; END;
+    BEGIN
+      UPDATE core.order_item_category_snapshot SET category_name=new_category
+      WHERE order_id=old_item.order_id AND order_item_id=old_item.order_item_id;
+      RAISE EXCEPTION 'Category snapshot mutation was accepted';
+    EXCEPTION WHEN check_violation THEN NULL; END;
     RAISE NOTICE 'History scenario passed: old sale/address fixed, new sale uses new category';
 END $$;
 ROLLBACK;

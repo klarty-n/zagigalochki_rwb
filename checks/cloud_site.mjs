@@ -24,6 +24,10 @@ try {
   assert.equal(quality.orderCount,99441);
   const model=await get('/api/model');
   assert.equal(model.marts.length,8);
+  assert.equal(model.entities.length,11);
+  assert.equal(model.entities.find(e=>e.id==='order_address_snapshot').count,99441);
+  assert.equal(model.entities.find(e=>e.id==='order_item_category_snapshot').count,112650);
+  assert.ok(model.entities.find(e=>e.id==='seller_product_category_history').count>0);
   assert.equal(model.martAvailable,true);
   const filtered=await get('/api/overview?start=2016-11&end=2016-11&state=all');
   assert.equal(filtered.kpis.revenueCents,0);
