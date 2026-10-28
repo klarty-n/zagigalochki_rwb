@@ -114,3 +114,7 @@ http://localhost:8080).
 - Витрины: `model/03_mart.sql`; доступ дашборда: `deploy/dashboard_access.sql`.
 - Запросы для фронтенда: `queries/dashboard.sql`; проверки: `checks/mart.sql`.
 - [Что проверено локально и что ещё не развёрнуто](reports/mart-validation.md).
+
+## Блок Б и вброс
+
+Запросы 6–10: `queries/block_b_all.sql` (шесть результатов, поскольку у №9 два разреза). Результаты: `results/block_b/`. [Определения и ответы](docs/analyst/answers-block-b.md). [Обязательная историчность: контракт архитектору](docs/analyst/history-handoff.md). Вброс пока не реализован; результаты блока Б проверены на текущем core.

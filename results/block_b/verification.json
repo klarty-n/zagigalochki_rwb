@@ -1,0 +1,105 @@
+{
+  "status": "passed",
+  "source": "core",
+  "checked_at_utc": "2026-10-28T13:27:22.947410+00:00",
+  "checks": [
+    {
+      "name": "Q6 all units of selected product",
+      "passed": true
+    },
+    {
+      "name": "Q6 maximal distinct prices",
+      "passed": true
+    },
+    {
+      "name": "Q6 date-price pairs unique",
+      "passed": true
+    },
+    {
+      "name": "Q7 states unique and >=500",
+      "passed": true
+    },
+    {
+      "name": "Q7 eligible order count",
+      "passed": true
+    },
+    {
+      "name": "Q8 all orders preserved",
+      "passed": true
+    },
+    {
+      "name": "Q8 no-item count independently reconciled",
+      "passed": true
+    },
+    {
+      "name": "Q8 shares sum to 100",
+      "passed": true
+    },
+    {
+      "name": "Q9a all 2018 payment records",
+      "passed": true
+    },
+    {
+      "name": "Q9a independent amount",
+      "passed": true
+    },
+    {
+      "name": "Q9b all-time payments preserved",
+      "passed": true
+    },
+    {
+      "name": "Q10 scores 1..5 preserved",
+      "passed": true
+    },
+    {
+      "name": "Q10 one reviewed delivered order counted once",
+      "passed": true
+    },
+    {
+      "name": "Delivery percentages and means valid",
+      "passed": true
+    },
+    {
+      "name": "Delivery percentages and means valid",
+      "passed": true
+    }
+  ],
+  "history_migration_verified": false,
+  "selected_product": {
+    "product_id": "437c05a395e9e47f9762e677a7068ce7",
+    "prices": "31",
+    "units": "151"
+  },
+  "queries": {
+    "06_product_price_history": {
+      "rows": 76,
+      "sql_sha256": "0af6174f8e77e0b0730fec7b85d0431c5801f936ce1b28bf35bb77b4747036e0",
+      "csv_sha256": "72fe779ffe70b60ceda9e9547771039d90fa14fca65835f63f6e764b4d5fadc9"
+    },
+    "07_delivery_by_state": {
+      "rows": 17,
+      "sql_sha256": "8937c4b586e04d1314abf6dbe4c2d6d879ecb8c4a1b8965a72899dcfc03e8882",
+      "csv_sha256": "fb5d958d8492efcc3eaa697d1af07e50113bed5b10da960cfaf53c7dd95fbb7c"
+    },
+    "08_status_funnel": {
+      "rows": 8,
+      "sql_sha256": "b1e205ee73bdeeed64f2ad3e200080f90dfe7999f3bc2f91a0acb0594c84d509",
+      "csv_sha256": "385e1c74e29ce8fec3e62ad423ff218cdd2e8e80bc3f40f2cfbb8324ffbc984e"
+    },
+    "09_payments_by_state": {
+      "rows": 27,
+      "sql_sha256": "00614589a7b688ea90994e5b67df689985a1cf768d10ac4544428d85c3f2405a",
+      "csv_sha256": "824250f95ee601f56bfe205573c9536617f652939415e35bfe6c8ec793fa5500"
+    },
+    "09_payment_methods": {
+      "rows": 5,
+      "sql_sha256": "3c9e0c4172826ad2a260cd2b66d5e92143e4d5be43b28c3854e2bc1ac9fd77be",
+      "csv_sha256": "fee79cb0a48cde2be4158277c7421a23b29270876e7d5c59a2ce374bfd2bc316"
+    },
+    "10_reviews_and_delivery": {
+      "rows": 5,
+      "sql_sha256": "661b16fe8a800ef4cfd2acf65ac4f18a6e374e074094a0b8a29afd5249a271e9",
+      "csv_sha256": "629196bd6bf1c679deacee4f6134e831a830d204159450ae4683de83ef202535"
+    }
+  }
+}
