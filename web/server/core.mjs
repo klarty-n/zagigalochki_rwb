@@ -5,6 +5,8 @@ import pg from 'pg';
 export function createCoreProvider(connectionString) {
   if (!connectionString) throw new Error('Для DATA_SOURCE=core требуется DATABASE_URL.');
   const pool = new pg.Pool({ connectionString, max: 3, connectionTimeoutMillis: 5000 });
+  const cacheTtlMs = Number(process.env.CORE_CACHE_TTL_MS || 60000);
+  if (!Number.isFinite(cacheTtlMs) || cacheTtlMs < 1000 || cacheTtlMs > 1800000) throw new Error('Invalid CORE_CACHE_TTL_MS');
   let cached;
   let pending;
   async function read() {
@@ -76,7 +78,7 @@ export function createCoreProvider(connectionString) {
   }
   return {
     async getData() {
-      if (cached && Date.now() - Date.parse(cached.loadedAt) < 60_000) return cached;
+      if (cached && Date.now() - Date.parse(cached.loadedAt) < cacheTtlMs) return cached;
       if (!pending) pending = read().then(data => (cached = data)).finally(() => { pending = undefined; });
       return pending;
     },

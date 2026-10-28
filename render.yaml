@@ -1,0 +1,28 @@
+# One shared website/API; PostgreSQL is hosted separately in Neon Free.
+services:
+  - type: web
+    name: capibara-marketplace
+    runtime: node
+    plan: free
+    region: frankfurt
+    repo: https://github.com/klarty-n/zagigalochki_rwb
+    branch: participant3/analysis
+    rootDir: web
+    buildCommand: npm ci --no-audit --no-fund && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22.16.0"
+      - key: DATA_SOURCE
+        value: mart
+      - key: HOST
+        value: 0.0.0.0
+      - key: CORE_CACHE_TTL_MS
+        value: "600000"
+      - key: DATABASE_URL
+        sync: false
+      - key: DASHBOARD_USERNAME
+        value: team
+      - key: DASHBOARD_PASSWORD
+        generateValue: true

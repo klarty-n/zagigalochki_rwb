@@ -16,7 +16,7 @@ const provider = source === 'mart' ? createMartProvider(process.env.DATABASE_URL
   return demo;
 }, close: async () => {} };
 const port = Number(process.env.PORT || 3001);
-const server = createApp(provider, source).listen(port, process.env.HOST || '0.0.0.0', () => {
+const server = createApp(provider, source, { username: process.env.DASHBOARD_USERNAME, password: process.env.DASHBOARD_PASSWORD }).listen(port, process.env.HOST || '0.0.0.0', () => {
   console.log(`Capibara API: http://localhost:${port} · source=${source}`);
 });
 for (const signal of ['SIGTERM', 'SIGINT']) process.once(signal, () => {

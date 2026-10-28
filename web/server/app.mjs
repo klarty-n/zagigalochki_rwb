@@ -1,4 +1,5 @@
 import express from 'express';
+import { teamAccess } from './access.mjs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
@@ -7,7 +8,7 @@ import { inspectQuality, listOrders, orderDetail, parseOrderQuery } from './expl
 import { modelPayload } from './model.mjs';
 import { teamSnapshot, verifyTeamSnapshot } from './team-snapshot.mjs';
 
-export function createApp(provider, source) {
+export function createApp(provider, source, access = {}) {
   const app = express();
   app.disable('x-powered-by');
   app.use((_req, res, next) => {
@@ -15,6 +16,7 @@ export function createApp(provider, source) {
     res.set('Referrer-Policy', 'same-origin');
     next();
   });
+  app.use(teamAccess(access));
   app.get('/api/health', (_req, res) => res.json({ status: 'ok', source }));
   app.get('/api/overview', async (req, res) => {
     try {
