@@ -1,0 +1,3 @@
+# Generated profiles contain source-specific samples and are recreated locally.
+*.json
+*.jsonl
