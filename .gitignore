@@ -17,3 +17,9 @@ __pycache__/
 deploy/secrets/
 deploy/backups/
 *.dump
+# Capibara Analytics
+node_modules/
+dist/
+.env
+.env.local
+*.log
