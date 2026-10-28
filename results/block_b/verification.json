@@ -1,8 +1,24 @@
 {
   "status": "passed",
   "source": "core",
-  "checked_at_utc": "2026-10-28T13:27:22.947410+00:00",
+  "checked_at_utc": "2026-10-28T14:38:41.915391+00:00",
   "checks": [
+    {
+      "name": "Every order has an address snapshot",
+      "passed": true
+    },
+    {
+      "name": "Every item has a category snapshot",
+      "passed": true
+    },
+    {
+      "name": "Category intervals cannot overlap",
+      "passed": true
+    },
+    {
+      "name": "Both historical snapshots protected",
+      "passed": true
+    },
     {
       "name": "Q6 all units of selected product",
       "passed": true
@@ -64,7 +80,8 @@
       "passed": true
     }
   ],
-  "history_migration_verified": false,
+  "history_structure_verified": true,
+  "history_note": "Snapshot coverage is tested here; behavioral history test is checks/history.sql",
   "selected_product": {
     "product_id": "437c05a395e9e47f9762e677a7068ce7",
     "prices": "31",
@@ -78,7 +95,7 @@
     },
     "07_delivery_by_state": {
       "rows": 17,
-      "sql_sha256": "8937c4b586e04d1314abf6dbe4c2d6d879ecb8c4a1b8965a72899dcfc03e8882",
+      "sql_sha256": "dee08256080aa04444b80c3d2d8b7d5242ce0daac6893f92ea8aa3c11dec046c",
       "csv_sha256": "fb5d958d8492efcc3eaa697d1af07e50113bed5b10da960cfaf53c7dd95fbb7c"
     },
     "08_status_funnel": {
@@ -88,7 +105,7 @@
     },
     "09_payments_by_state": {
       "rows": 27,
-      "sql_sha256": "00614589a7b688ea90994e5b67df689985a1cf768d10ac4544428d85c3f2405a",
+      "sql_sha256": "a1bf419970db3167fc9e6c319955372a5f45d4dd0033393bd365de1fc9a015f6",
       "csv_sha256": "824250f95ee601f56bfe205573c9536617f652939415e35bfe6c8ec793fa5500"
     },
     "09_payment_methods": {
