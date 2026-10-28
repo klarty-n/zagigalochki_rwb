@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" type="device">
+  <diagram id="history-flow" name="Raw → core → mart">
+    <mxGraphModel grid="1" gridSize="10" page="1" pageWidth="2500" pageHeight="1280" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Модель маркетплейса · от raw до mart" style="text;html=0;align=left;verticalAlign=middle;fontFamily=Segoe UI;fontSize=38;fontStyle=1;fontColor=#203b55;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="25" width="2200" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Снимки создаются при оформлении заказа и продаже единицы товара; старые отчёты не переписываются." style="text;html=0;align=left;verticalAlign=middle;fontFamily=Segoe UI;fontSize=21;fontStyle=0;fontColor=#203b55;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="94" width="2350" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="flow0" value="" source="raw" target="core" edge="1" parent="1" style="edgeStyle=segmentEdgeStyle;html=0;rounded=0;endArrow=block;endFill=1;strokeColor=#738fa8;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow1" value="" source="core" target="history" edge="1" parent="1" style="edgeStyle=segmentEdgeStyle;html=0;rounded=0;endArrow=block;endFill=1;strokeColor=#738fa8;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow2" value="" source="history" target="mart" edge="1" parent="1" style="edgeStyle=segmentEdgeStyle;html=0;rounded=0;endArrow=block;endFill=1;strokeColor=#738fa8;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="raw" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="260" width="530" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="raw_header" value="raw · исходные данные&#10;8 CSV, значения сохраняются как есть" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#e8f0fc;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="raw">
+          <mxGeometry x="0" y="0" width="530" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="raw_row0" value="orders · customers" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="raw">
+          <mxGeometry x="0" y="76" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="raw_row1" value="order_items · products" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="raw">
+          <mxGeometry x="0" y="122" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="raw_row2" value="sellers · payments · reviews" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="raw">
+          <mxGeometry x="0" y="168" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="raw_row3" value="все поля исходно text" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="raw">
+          <mxGeometry x="0" y="214" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="core" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="650" y="260" width="530" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="core_header" value="core · факты&#10;ключи, типы и связи" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#e5f3ef;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="core">
+          <mxGeometry x="0" y="0" width="530" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="core_row0" value="orders · order_items" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="core">
+          <mxGeometry x="0" y="76" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="core_row1" value="customers · products · sellers" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="core">
+          <mxGeometry x="0" y="122" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="core_row2" value="categories · payments · reviews" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="core">
+          <mxGeometry x="0" y="168" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="core_row3" value="проверка целостности" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="core">
+          <mxGeometry x="0" y="214" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="history" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="260" width="530" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="history_header" value="core · история&#10;состояние на момент события" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#eee9f8;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="history">
+          <mxGeometry x="0" y="0" width="530" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="history_row0" value="order_address_snapshot" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="history">
+          <mxGeometry x="0" y="76" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="history_row1" value="order_item_category_snapshot" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="history">
+          <mxGeometry x="0" y="122" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="history_row2" value="seller_product_category_history" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="history">
+          <mxGeometry x="0" y="168" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="history_row3" value="старые снимки не перезаписываются" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="history">
+          <mxGeometry x="0" y="214" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="mart" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1870" y="260" width="530" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="mart_header" value="mart · аналитика&#10;VIEW поверх core" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#fff2d7;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="mart">
+          <mxGeometry x="0" y="0" width="530" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="mart_row0" value="order_metrics · delivered_items" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="mart">
+          <mxGeometry x="0" y="76" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="mart_row1" value="monthly_sales · seller_monthly_sales" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="mart">
+          <mxGeometry x="0" y="122" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="mart_row2" value="category_monthly_sales · KPI" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="mart">
+          <mxGeometry x="0" y="168" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="mart_row3" value="единые формулы для дашборда" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="mart">
+          <mxGeometry x="0" y="214" width="530" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="move" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="760" width="900" height="292" as="geometry" />
+        </mxCell>
+        <mxCell id="move_header" value="Покупатель переехал&#10;что увидит отчёт по доставке" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#e5f3ef;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="move">
+          <mxGeometry x="0" y="0" width="900" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="move_row0" value="Заказ 1: штат SP → снимок SP" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="move">
+          <mxGeometry x="0" y="76" width="900" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="move_row1" value="Позже новый адрес: штат RJ" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="move">
+          <mxGeometry x="0" y="130" width="900" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="move_row2" value="Заказ 2: штат RJ → снимок RJ" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="move">
+          <mxGeometry x="0" y="184" width="900" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="move_row3" value="Старый заказ остаётся в SP" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="move">
+          <mxGeometry x="0" y="238" width="900" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="reclass" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="760" width="900" height="292" as="geometry" />
+        </mxCell>
+        <mxCell id="reclass_header" value="Продавец сменил категорию&#10;что увидит отчёт по выручке" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#eee9f8;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="reclass">
+          <mxGeometry x="0" y="0" width="900" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="reclass_row0" value="Продажа 1: «Книги» → снимок «Книги»" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="reclass">
+          <mxGeometry x="0" y="76" width="900" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="reclass_row1" value="Новая версия: «Электроника»" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="reclass">
+          <mxGeometry x="0" y="130" width="900" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="reclass_row2" value="Продажа 2: снимок «Электроника»" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="reclass">
+          <mxGeometry x="0" y="184" width="900" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="reclass_row3" value="Старая выручка остаётся в «Книгах»" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="reclass">
+          <mxGeometry x="0" y="238" width="900" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="footer" value="Граница данных: CSV даёт только первое известное состояние, прежние смены категории восстановить нельзя." style="text;html=0;align=left;verticalAlign=middle;fontFamily=Segoe UI;fontSize=20;fontStyle=0;fontColor=#8a6636;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1180" width="2400" height="42" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
