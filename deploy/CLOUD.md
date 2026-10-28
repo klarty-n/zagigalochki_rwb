@@ -15,6 +15,9 @@ Neon Free: проект DATABASE, PostgreSQL 16, AWS Frankfurt, база marketp
 
 ## Сайт и API
 
+Рабочий адрес: https://capibara-marketplace.onrender.com. Сервис создан на Render Free и проверен внешними HTTP-запросами. Подтверждение почты Render завершено. Реквизиты для команды находятся в локальном игнорируемом deploy/secrets/team-access.txt; это файл с паролями, его передают только участникам, не коммитят.
+
+
 render.yaml описывает один Render Web Service на Free, собирающий web из participant3/analysis. Он отдаёт и React, и /api: браузеру не нужны реквизиты БД. В Render DATABASE_URL задаётся секретом из neon-backend.url. HOST=0.0.0.0, PORT задаёт Render. Node 22, сборка npm ci && npm run build, запуск npm start.
 
 DASHBOARD_USERNAME=team и DASHBOARD_PASSWORD ограничивают доступ к сайту общей командной учёткой (HTTP Basic поверх HTTPS). Пароль не связан с паролем БД. /api/health доступен хостингу без авторизации. В локальной среде пароль интерфейса необязателен; в render.yaml он генерируется.
