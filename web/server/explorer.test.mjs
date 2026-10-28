@@ -52,7 +52,7 @@ test('checks reflect input defects and never claim raw/core reconciliation ran',
 test('model separates documented schema from current counts and offline counts are unknown', () => {
   const data = makeDemoData();
   const model = modelPayload(data, 'demo');
-  assert.equal(model.entities.length, 8);
+  assert.equal(model.entities.length, 11);
   assert.equal(model.entities.find(e => e.id === 'order_payments').count, data.orders.reduce((s, o) => s + o.payments.length, 0));
   const offline = modelPayload(null, 'core');
   assert.equal(offline.available, false);
@@ -79,7 +79,7 @@ test('API exposes list/detail/checks/model with 404, validation and offline beha
   const quality = await (await fetch(`${base}/api/quality`)).json();
   assert.equal(quality.meta.source, 'demo');
   assert.equal(quality.orderCount, data.orders.length);
-  assert.equal((await (await fetch(`${base}/api/model`)).json()).entities.length, 8);
+  assert.equal((await (await fetch(`${base}/api/model`)).json()).entities.length, 11);
 });
 
 test('offline core keeps schema accessible but orders and checks fail explicitly', async t => {

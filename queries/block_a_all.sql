@@ -76,13 +76,14 @@ FROM per_person;
 
 -- Вопрос 5.
 WITH category_sales AS (
-    SELECT p.category_name,
+    SELECT snap.category_name,
            SUM(i.price) AS revenue
     FROM core.order_items AS i
     INNER JOIN core.orders AS o ON o.order_id = i.order_id
-    INNER JOIN core.products AS p ON p.product_id = i.product_id
+    INNER JOIN core.order_item_category_snapshot AS snap
+      ON snap.order_id = i.order_id AND snap.order_item_id = i.order_item_id
     WHERE o.order_status = 'delivered'
-    GROUP BY p.category_name
+    GROUP BY snap.category_name
 )
 SELECT COALESCE(c.category_name_english, r.category_name, 'Не указана') AS category,
        r.revenue,

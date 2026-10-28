@@ -208,9 +208,43 @@ INSERT INTO etl.table_stats SELECT current_setting('etl.run_id')::uuid, 'orders'
 
 INSERT INTO core.orders AS target (order_id, customer_id, order_status, order_purchase_at, order_approved_at, delivered_carrier_at, delivered_customer_at, estimated_delivery_date) SELECT order_id, customer_id, order_status, order_purchase_at, order_approved_at, delivered_carrier_at, delivered_customer_at, estimated_delivery_date FROM stage_orders WHERE cardinality(_errors)=0 ON CONFLICT (order_id) DO UPDATE SET customer_id=excluded.customer_id, order_status=excluded.order_status, order_purchase_at=excluded.order_purchase_at, order_approved_at=excluded.order_approved_at, delivered_carrier_at=excluded.delivered_carrier_at, delivered_customer_at=excluded.delivered_customer_at, estimated_delivery_date=excluded.estimated_delivery_date WHERE ROW(target.customer_id,target.order_status,target.order_purchase_at,target.order_approved_at,target.delivered_carrier_at,target.delivered_customer_at,target.estimated_delivery_date) IS DISTINCT FROM ROW(excluded.customer_id,excluded.order_status,excluded.order_purchase_at,excluded.order_approved_at,excluded.delivered_carrier_at,excluded.delivered_customer_at,excluded.estimated_delivery_date);
 
+-- First accepted address for an order is immutable. Re-reading a later buyer profile
+-- must not move historical deliveries to another state.
+INSERT INTO core.order_address_snapshot(order_id, zip_code_prefix, city, state)
+SELECT o.order_id, c.zip_code_prefix, c.city, c.state
+FROM core.orders o JOIN core.customers c USING(customer_id)
+ON CONFLICT (order_id) DO NOTHING;
+
 INSERT INTO etl.table_stats SELECT current_setting('etl.run_id')::uuid, 'order_items', (SELECT COUNT(*) FROM stage_order_items), COUNT(*), (SELECT COUNT(*) FROM stage_order_items WHERE cardinality(_errors)>0), COUNT(*) FILTER (WHERE c.order_id IS NULL), COUNT(*) FILTER (WHERE c.order_id IS NOT NULL AND (ROW(c.product_id,c.seller_id,c.shipping_limit_at,c.price,c.freight_value) IS DISTINCT FROM ROW(s.product_id,s.seller_id,s.shipping_limit_at,s.price,s.freight_value))), COUNT(*) FILTER (WHERE c.order_id IS NOT NULL AND NOT (ROW(c.product_id,c.seller_id,c.shipping_limit_at,c.price,c.freight_value) IS DISTINCT FROM ROW(s.product_id,s.seller_id,s.shipping_limit_at,s.price,s.freight_value))) FROM stage_order_items s LEFT JOIN core.order_items c ON c.order_id=s.order_id AND c.order_item_id=s.order_item_id WHERE cardinality(s._errors)=0;
 
 INSERT INTO core.order_items AS target (order_id, order_item_id, product_id, seller_id, shipping_limit_at, price, freight_value) SELECT order_id, order_item_id, product_id, seller_id, shipping_limit_at, price, freight_value FROM stage_order_items WHERE cardinality(_errors)=0 ON CONFLICT (order_id, order_item_id) DO UPDATE SET product_id=excluded.product_id, seller_id=excluded.seller_id, shipping_limit_at=excluded.shipping_limit_at, price=excluded.price, freight_value=excluded.freight_value WHERE ROW(target.product_id,target.seller_id,target.shipping_limit_at,target.price,target.freight_value) IS DISTINCT FROM ROW(excluded.product_id,excluded.seller_id,excluded.shipping_limit_at,excluded.price,excluded.freight_value);
+
+-- The original CSV has no category-change timestamps. Seed one explicitly
+-- inferred baseline for each seller/product; real future changes use the event API.
+INSERT INTO core.seller_product_category_history
+    (seller_id, product_id, valid_from, category_name, baseline_inferred)
+SELECT i.seller_id, i.product_id, min(o.order_purchase_at), p.category_name, true
+FROM core.order_items i JOIN core.orders o USING(order_id)
+JOIN core.products p USING(product_id)
+WHERE NOT EXISTS (
+    SELECT 1 FROM core.seller_product_category_history h
+    WHERE h.seller_id=i.seller_id AND h.product_id=i.product_id)
+GROUP BY i.seller_id, i.product_id, p.category_name
+ON CONFLICT DO NOTHING;
+
+INSERT INTO core.order_item_category_snapshot(order_id, order_item_id, category_name)
+SELECT i.order_id, i.order_item_id,
+       CASE WHEN h.valid_from IS NOT NULL THEN h.category_name ELSE p.category_name END
+FROM core.order_items i JOIN core.orders o USING(order_id)
+JOIN core.products p USING(product_id)
+LEFT JOIN LATERAL (
+    SELECT category_name, valid_from FROM core.seller_product_category_history h
+    WHERE h.seller_id=i.seller_id AND h.product_id=i.product_id
+      AND h.valid_from <= o.order_purchase_at
+      AND (h.valid_to IS NULL OR o.order_purchase_at < h.valid_to)
+    ORDER BY h.valid_from DESC LIMIT 1
+) h ON true
+ON CONFLICT (order_id, order_item_id) DO NOTHING;
 
 INSERT INTO etl.table_stats SELECT current_setting('etl.run_id')::uuid, 'order_payments', (SELECT COUNT(*) FROM stage_order_payments), COUNT(*), (SELECT COUNT(*) FROM stage_order_payments WHERE cardinality(_errors)>0), COUNT(*) FILTER (WHERE c.order_id IS NULL), COUNT(*) FILTER (WHERE c.order_id IS NOT NULL AND (ROW(c.payment_type,c.payment_installments,c.payment_value) IS DISTINCT FROM ROW(s.payment_type,s.payment_installments,s.payment_value))), COUNT(*) FILTER (WHERE c.order_id IS NOT NULL AND NOT (ROW(c.payment_type,c.payment_installments,c.payment_value) IS DISTINCT FROM ROW(s.payment_type,s.payment_installments,s.payment_value))) FROM stage_order_payments s LEFT JOIN core.order_payments c ON c.order_id=s.order_id AND c.payment_sequential=s.payment_sequential WHERE cardinality(s._errors)=0;
 

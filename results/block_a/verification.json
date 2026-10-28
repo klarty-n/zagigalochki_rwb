@@ -1,10 +1,18 @@
 {
   "status": "passed",
-  "started_at_utc": "2026-10-28T10:53:18.226177+00:00",
+  "started_at_utc": "2026-10-28T13:34:11.296784+00:00",
   "validation_scope": "team_core",
   "core_queries_verified": true,
   "ready_for_submission": true,
   "checks": [
+    {
+      "name": "order address snapshot: one per order",
+      "passed": true
+    },
+    {
+      "name": "item category snapshot: one per item",
+      "passed": true
+    },
     {
       "name": "orders: unique keys",
       "passed": true
@@ -200,6 +208,13 @@
     "customers.zip_code_prefix",
     "customers.city",
     "customers.state",
+    "order_address_snapshot.order_id",
+    "order_address_snapshot.zip_code_prefix",
+    "order_address_snapshot.city",
+    "order_address_snapshot.state",
+    "order_item_category_snapshot.order_id",
+    "order_item_category_snapshot.order_item_id",
+    "order_item_category_snapshot.category_name",
     "order_items.order_id",
     "order_items.order_item_id",
     "order_items.product_id",
@@ -236,6 +251,12 @@
     "products.length_cm",
     "products.height_cm",
     "products.width_cm",
+    "seller_product_category_history.seller_id",
+    "seller_product_category_history.product_id",
+    "seller_product_category_history.valid_from",
+    "seller_product_category_history.valid_to",
+    "seller_product_category_history.category_name",
+    "seller_product_category_history.baseline_inferred",
     "sellers.seller_id",
     "sellers.zip_code_prefix",
     "sellers.city",
@@ -244,45 +265,45 @@
   "raw_snapshot": {
     "orders": {
       "rows": 99441,
-      "digest": "8be4ba56cb4d1b29bc85b291ae8c1b01"
+      "digest": "be8f628fe8dd72b88aa87ee51bf49398"
     },
     "order_items": {
       "rows": 112650,
-      "digest": "e79ab8cb18e5c79eed9f3eeddad92877"
+      "digest": "290cf7a90c7cfdfcd37296bbe044ad62"
     },
     "order_payments": {
       "rows": 103886,
-      "digest": "31f86b36dbf72d066ab1a1e37dd547a9"
+      "digest": "2e7bc04299f4db9602b237831f3e0380"
     },
     "order_reviews": {
       "rows": 99224,
-      "digest": "d60542742063fb2ff4cd7899f2112557"
+      "digest": "4db9bbb08214f1fa6d31b287d7eaa13c"
     },
     "products": {
       "rows": 32951,
-      "digest": "798b275838d5630e1b65a2732e03a7bb"
+      "digest": "cad839bc1097cfc3cc10f69f3daa040a"
     },
     "sellers": {
       "rows": 3095,
-      "digest": "35b0899f33a336c69f2450614258c091"
+      "digest": "0a0b8041168ff27081c06692788d7193"
     },
     "customers": {
       "rows": 99441,
-      "digest": "db9bea440a018e43b59c8a7115bf9cbf"
+      "digest": "cad6f9b0d19015efb8d92db66535232b"
     },
     "product_category_translation": {
       "rows": 71,
-      "digest": "ba873d0cf24a1ac137e77ba0f1a4efff"
+      "digest": "64e0675372b178be8a1382ad7b20c94d"
     }
   },
   "query_sha256": {
-    "01_monthly_revenue": "b22132cd963c6fcb40a55a952729b31576fcb59e57ba19d8f45efe74a8254b51",
-    "02_top_sellers": "5ad18b2a2b6c1c30e0aa8713cef7132eb4df21d79f2823db1222f9461f701900",
-    "03_average_order": "6ea78151ba8cf345d0848c22fd5bdc275d2420cc95176ed86f0d627551d69770",
-    "04_repeat_customers": "d063987714ae997e6aa7ed86717ac820dde1968f2f1e59878d84661f1969eea9",
-    "05_category_revenue": "c13401ac76e898e14ac090c537602f717afc9ffaf8a0b0961d4798dfd17bbbf8"
+    "01_monthly_revenue": "a753f9da0f8ef58f0487a69df7e6305c3bf0c6778d177410f0603445641d6ef0",
+    "02_top_sellers": "d77e0530f640d5eda39658487538ce5cc7a24c9ad12cf467810494e544d207d5",
+    "03_average_order": "6208fb847c9997a8366e180081bd821df4b72146353ee690e3633fe2d82ff58e",
+    "04_repeat_customers": "379a6a56af074f2c3741382f35566bc21e6e308176933f9061cfbc66c2acfd42",
+    "05_category_revenue": "ec7cd4b63304d490d4eeea8a1fcc03af2514eb2e5500f8f57738446861006293"
   },
-  "runner_sha256": "b8bd229dc1ade9a5fee89b3ae5a1d6e8b6c383f8c692b853d64c43491e4701f6",
+  "runner_sha256": "fe24034e7b075cb4db4a36c05d8dfe1ec3644ee4b962be3096dda9937ae6fc41",
   "output_rows": {
     "01_monthly_revenue": 24,
     "02_top_sellers": 10,
@@ -291,12 +312,12 @@
     "05_category_revenue": 74
   },
   "results_sha256": {
-    "01_monthly_revenue": "fb98222f38195170a2788f85c7f34f2f374a0a4405db6ccf57a0c73e0a4ac22a",
-    "02_top_sellers": "15b4420d68f0c15c6cf96910e58223468ec4a5b0f5cc0c5480c9cbfac294718e",
-    "03_average_order": "20c35e77dd473a1311c03804540691e21e75961458a63692a27b00486220bd7c",
-    "04_repeat_customers": "1170d6a92a03384df4af6ac5b306b8ae4adaab07320abffcb8bdf399db9eb43a",
-    "05_category_revenue": "42b976b81da056ea2b48b4b59c0b8f84ff77e5e9cd4cfb44eea6f42bffc15959"
+    "01_monthly_revenue": "81c49faf5e72f953c692ff7dd1a1a88de25ee21a6db8d0e36db02950ace61a25",
+    "02_top_sellers": "79aa63df6d9cea51dc840995e8cf8a704afccb4642d753207e30981dccc65d25",
+    "03_average_order": "6b7a489f7b6c4305342de5dfbce49c17c2e232abbac60dfce79f1f24d1e97b78",
+    "04_repeat_customers": "8eb4231159ddc82839b834c06b210cd55bf3705b0801b3363ac7b7dc9746ebf8",
+    "05_category_revenue": "e336cf324672eb397b5cceb58bab57c312667748138ce98206e98fa2621beb10"
   },
-  "local_commit": "f3d967d49e95936fe42f56ab71c8693af21746c7",
-  "completed_at_utc": "2026-10-28T10:53:28.105141+00:00"
+  "local_commit": "5683a2f91e9368150e697e911a9b1bd33a40fb27",
+  "completed_at_utc": "2026-10-28T13:34:37.848151+00:00"
 }
