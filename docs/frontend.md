@@ -97,3 +97,7 @@ npm run build
 Приложение целиком находится в `web/`. Упоминаемые выше `server/core.mjs` и `.env` — пути относительно `web/`.
 
 `web/src/` — React + TypeScript, Tailwind/CSS, Recharts, Lucide и локально поставляемая Geologica. `web/server/` — Express, демогенератор, расчёты и адаптер PostgreSQL. Конфиденциальные параметры только в `web/.env`, не в клиентском коде.
+
+## Подключение mart
+
+В participant3/analysis добавлен DATA_SOURCE=mart: backend агрегирует SQL из mart и сохраняет JSON-контракт /api/overview, графики и фильтры. Инструкция и права доступа — docs/analytics/mart.md. Пример конфигурации — web/.env.example. Для страниц заказов и качества остаётся DATA_SOURCE=core. Пароли передаются только backend через игнорируемый web/.env.

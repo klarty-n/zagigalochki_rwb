@@ -24,13 +24,14 @@ export function createApp(provider, source) {
         verifyTeamSnapshot();
         return res.set('Cache-Control', 'no-store').json(teamSnapshot);
       }
+      if (source === 'mart') return res.set('Cache-Control', 'no-store').json(await provider.getOverview(filters));
       const data = await provider.getData();
       if (filters.state !== 'all' && !data.orders.some(o => o.state === filters.state)) throw new InputError('Штат отсутствует в данных.');
       res.set('Cache-Control', 'no-store').json(summarize(data, filters));
     } catch (error) {
       if (error instanceof InputError) return res.status(400).json({ error: error.message });
       console.error('[overview]', error.message);
-      return res.status(503).json({ error: 'Не удалось прочитать данные. Проверьте подключение и соответствие схемы core контракту команды.' });
+      return res.status(503).json({ error: 'Не удалось прочитать данные. Проверьте подключение и соответствие схем core/mart контракту команды.' });
     }
   });
   const handle = fn => async (req, res) => {

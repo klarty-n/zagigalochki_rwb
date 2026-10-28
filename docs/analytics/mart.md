@@ -30,3 +30,35 @@
 - dashboard_reader читает только 5 агрегированных витрин; подробные заказы/идентификаторы покупателей ему не выдаются.
 
 Примеры для фронтенда — queries/dashboard.sql. Итоговые сдаваемые queries/01…05 по core сохранены.
+
+## Онлайн-дашборд (ветка iskan_branch интегрирована)
+
+`web/server/mart.mjs` читает только mart.order_metrics и mart.delivered_items, выполняет фильтрацию и агрегацию в PostgreSQL в READ ONLY / REPEATABLE READ транзакции. API `/api/overview?start=2016-09&end=2018-08&state=all` возвращает прежний JSON-контракт фронтенда. Параметры передаются через $1/$2/$3, пароль остаётся только на backend. Никакого скрытого перехода на демо при ошибке нет.
+
+В обе детальные витрины добавлен buyer_state: фильтр региона относится к покупателю, а не продавцу. Для этого API повторные покупки пересчитываются **в выбранном периоде и регионе**, все статусы; глобальная mart.repeat_customers остаётся за всё время. При переключении фильтров эти определения не смешиваются. Не требуется отдавать клиенту всю базу.
+
+Для backend создана групповая NOLOGIN-роль dashboard_api: наследует агрегаты dashboard_reader и читает две детальные витрины со стабильным ключом покупателя. Это серверный доступ, не роль для браузера. В psql администратор один раз создаёт логин:
+
+```sql
+CREATE ROLE dashboard_backend LOGIN;
+GRANT dashboard_api TO dashboard_backend;
+ALTER ROLE dashboard_backend SET default_transaction_read_only=on;
+\password dashboard_backend
+```
+
+`model/03_mart.sql` и затем `deploy/dashboard_access.sql` должны быть выполнены до запуска API.
+
+```bash
+cd web
+npm ci
+cp .env.example .env
+# В .env указать DATABASE_URL реальной базы и пароль dashboard_backend.
+# DATA_SOURCE=mart; локальный порт Mac 5433, на сервере через туннель — ваш порт.
+npm run dev
+```
+
+API: http://localhost:3001/api/overview, интерфейс: адрес Vite из терминала. Для собранного интерфейса: `npm run build && npm start`, затем http://localhost:3001. `.env` исключён из Git. Для общего доступа нужен общий backend и доступная ему база; GitHub сам базу не размещает.
+
+Режим mart обслуживает обзор и фильтры. Детальные заказы и диагностика качества доступны через прежний DATA_SOURCE=core, поскольку этим экранам нужны платежи и отзывы. Страница модели показывает схему без счётчиков в режиме mart.
+
+Проверки: `npm test`, `npm run build`. Дополнительное сравнение SQL с прежним core-расчётом: задать MART_TEST_DATABASE_URL перед `npm test`; проверяет полный период, регион, сокращённый период и пустой месяц. Для этого теста нужна тестовая учётка с чтением core и mart; рабочему dashboard_backend core не выдаётся.

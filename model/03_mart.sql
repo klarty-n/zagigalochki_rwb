@@ -17,7 +17,7 @@ SELECT o.order_id, c.customer_unique_id, o.order_status, o.order_purchase_at,
  COALESCE(i.product_value+i.freight_value,0::numeric) AS order_value,
  COALESCE(i.units,0::bigint) AS units,
  COALESCE(i.item_lines,0::bigint) AS item_lines,
- i.order_id IS NOT NULL AS has_items
+ i.order_id IS NOT NULL AS has_items, c.state AS buyer_state
 FROM core.orders o JOIN core.customers c USING(customer_id)
 LEFT JOIN items i USING(order_id);
 
@@ -28,8 +28,9 @@ SELECT i.order_id, i.order_item_id, i.product_id, i.seller_id,
  o.order_purchase_at, i.price, i.freight_value,
  s.city AS seller_city, s.state AS seller_state,
  p.category_name AS category_code,
- COALESCE(NULLIF(btrim(c.category_name_english),''),p.category_name,'Не указана') AS category
+ COALESCE(NULLIF(btrim(c.category_name_english),''),p.category_name,'Не указана') AS category, buyer.state AS buyer_state
 FROM core.order_items i JOIN core.orders o USING(order_id)
+JOIN core.customers buyer ON buyer.customer_id=o.customer_id
 JOIN core.sellers s USING(seller_id)
 JOIN core.products p USING(product_id)
 LEFT JOIN core.categories c ON c.category_name=p.category_name
