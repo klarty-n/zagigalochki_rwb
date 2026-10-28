@@ -88,9 +88,13 @@ function Dashboard({ data, showInfo, filters, onMonth }: {
   data: Overview; showInfo: (key: Explanation) => void; filters: Filters; onMonth: (point: MonthPoint) => void;
 }) {
   const [allCategories, setAllCategories] = useState(false);
+  const [categoryQuery, setCategoryQuery] = useState('');
   const [sellerDetail, setSellerDetail] = useState<Overview['sellers'][number] | null>(null);
   const k = data.kpis;
-  const categories = allCategories ? data.categories : data.categories.slice(0, 6);
+  const query = categoryQuery.trim().toLocaleLowerCase('ru');
+  const categories = query
+    ? data.categories.filter(c => `${c.name} ${c.id ?? ''}`.toLocaleLowerCase('ru').includes(query))
+    : allCategories ? data.categories : data.categories.slice(0, 6);
   return <>
     <section className="metrics-grid" aria-label="Ключевые показатели">
       <Metric label="Товарная выручка" Icon={BarChart3} value={money(k.revenueCents)} compact={shortMoney(k.revenueCents)} caption="Доставленные товары · без доставки" onInfo={() => showInfo('revenue')} />
@@ -110,8 +114,13 @@ function Dashboard({ data, showInfo, filters, onMonth }: {
         <div className="panel-note"><Info size={13} />Регион в таблице — штат продавца</div>
       </section>
       <section className="panel category-panel" aria-labelledby="categories-title"><div className="panel-heading"><div className="heading-line"><h2 id="categories-title">Выручка по категориям</h2><InfoButton label="Выручка по категориям" onClick={() => showInfo('categories')} /></div><span className="muted panel-subtitle">{data.meta.hasGroupedCategories ? '74 категории · топ-10 и остальные суммарно' : 'Доля в выбранном срезе'}</span></div>
-        {!categories.length ? <EmptyBlock text="Продаж по категориям пока нет" /> : <div className="category-list">{categories.map((c, i) => <div className="category-row" key={c.id ?? '__missing'}><div className="category-title"><span className={c.id === null ? 'muted' : ''}>{c.name}</span><strong>{money(c.revenueCents)}</strong></div><div className="category-bar-row"><div className="category-track"><div className="category-fill" style={{ width: `${Math.max(c.share, 0.2)}%`, opacity: 1 - (i % 6) * 0.08 }} /></div><span>{decimal(c.share, 1)}%</span></div></div>)}</div>}
-        {data.categories.length > 6 && <button type="button" className="category-more" onClick={() => setAllCategories(!allCategories)} aria-expanded={allCategories}>{allCategories ? 'Свернуть категории' : (data.meta.hasGroupedCategories ? 'Показать топ-10 и остальные' : `Все категории (${data.categories.length})`)}<ChevronDown size={15} className={allCategories ? 'rotated' : ''} /></button>}
+        {!categories.length ? <EmptyBlock text={query ? 'Категория не найдена. Попробуйте другое название.' : 'Продаж по категориям пока нет'} /> : <div className="category-list">{categories.map((c, i) => <div className="category-row" key={c.id ?? '__missing'}><div className="category-title"><span className={c.id === null ? 'muted' : ''}>{c.name}</span><strong>{money(c.revenueCents)}</strong></div><div className="category-bar-row"><div className="category-track"><div className="category-fill" style={{ width: `${Math.max(c.share, 0.2)}%`, opacity: 1 - (i % 6) * 0.08 }} /></div><span>{decimal(c.share, 1)}%</span></div></div>)}</div>}
+        <div className="category-actions">
+          {data.categories.length > 6 && <button type="button" className="category-more" onClick={() => { setCategoryQuery(''); setAllCategories(!allCategories); }} aria-expanded={allCategories}>{allCategories ? 'Свернуть категории' : (data.meta.hasGroupedCategories ? 'Показать топ-10 и остальные' : `Все категории (${data.categories.length})`)}<ChevronDown size={15} className={allCategories ? 'rotated' : ''} /></button>}
+          <input type="search" className="category-search" aria-label="Поиск категории" placeholder="Найти категорию" value={categoryQuery} onChange={e => setCategoryQuery(e.target.value)} />
+        </div>
+        {query && <p className="category-search-note" role="status">Найдено: {categories.length}. Доли указаны от общей выручки.</p>}
+
         <div className="category-total"><span>Все категории{data.meta.categoryCount ? ` (${data.meta.categoryCount})` : ''}</span><strong>{money(k.revenueCents)}</strong><span>100%</span></div>
       </section>
     </div>
@@ -156,7 +165,7 @@ export default function App() {
     <a className="skip-link" href="#main">Перейти к аналитике</a>
     <header className="site-header"><div className="header-inner"><a className="wordmark" href="/" aria-label="Capibara Analytics — главная">capibara <span>analytics</span></a><nav className="desktop-nav" aria-label="Разделы">{nav}</nav></div></header>
     <main id="main" className="main-container">
-      <div className="page-heading"><div><p className="eyebrow">{copy.eyebrow}</p><h1>{copy.title}</h1><p className="page-subtitle">{copy.subtitle}</p></div><div className="header-actions"><button type="button" className="icon-button refresh" aria-label="Обновить данные" disabled={loading} onClick={() => setRefresh(n => n + 1)}><RefreshCw size={17} className={loading ? 'spinning' : ''} /></button>{route.page === 'overview' && <button type="button" className="button export-button" disabled={!data || loading || !!error} onClick={() => data && exportMonthly(data)}><ArrowDownToLine size={16} /><span>Экспорт CSV</span></button>}</div></div>
+      <div className="page-heading"><div>{route.page !== 'overview' && <p className="eyebrow">{copy.eyebrow}</p>}<h1>{copy.title}</h1><p className={`page-subtitle ${route.page === 'overview' ? 'overview-subtitle' : ''}`}>{copy.subtitle}</p></div><div className="header-actions"><button type="button" className="icon-button refresh" aria-label="Обновить данные" disabled={loading} onClick={() => setRefresh(n => n + 1)}><RefreshCw size={17} className={loading ? 'spinning' : ''} /></button>{route.page === 'overview' && <button type="button" className="button export-button" disabled={!data || loading || !!error} onClick={() => data && exportMonthly(data)}><ArrowDownToLine size={16} /><span>Экспорт CSV</span></button>}</div></div>
       {['overview', 'orders'].includes(route.page) && <div className="filter-row"><button type="button" className="filter-control period-control" disabled={snapshot} title={snapshot ? 'SQL-снимок доступен за весь период' : undefined} onClick={() => setPeriodOpen(true)} aria-label={`Выбрать период: ${periodLabel(filters.start, filters.end)}`}><CalendarDays size={17} /><span>{periodLabel(filters.start, filters.end)}</span><ChevronDown size={15} /></button>
         <label className="filter-control region-control"><MapPin size={17} /><span className="sr-only">Регион покупателя</span><select disabled={snapshot} value={filters.state} onChange={e => setFilters({ ...filters, state: e.target.value })}><option value="all">Все регионы</option>{(data?.regions || []).map(state => <option value={state} key={state}>{states[state] || state} ({state})</option>)}</select><ChevronDown size={15} /></label>
         {filtered && <button type="button" className="reset-filter" onClick={() => setFilters(initialFilters)}><X size={14} />Сбросить</button>}

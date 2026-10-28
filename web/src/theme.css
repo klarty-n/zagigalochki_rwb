@@ -29,8 +29,8 @@
 }
 body { background: var(--surface-page); }
 .site-header { height: 102px; background: var(--surface-page); border-bottom: 0; }
-.header-inner { border-bottom: 1px solid #e8e4ed; }
-.wordmark { font-family: 'Bounded', 'Geologica Cursive', sans-serif; font-variation-settings: normal; font-size: 30px; font-weight: 650; letter-spacing: -1.1px; }
+.header-inner { border-bottom: 2px solid #d9cfe3; }
+.wordmark { font-family: 'Bounded', 'Geologica Cursive', sans-serif; font-variation-settings: normal; font-size: 36px; font-weight: 650; letter-spacing: -1.3px; }
 .desktop-nav { background: #eee6f3; border-color: #e7deee; }
 .nav-tab { font-size: 14px; padding: 12px 23px; color: #685173; }
 .main-container { padding-top: 32px; }
@@ -180,3 +180,98 @@ td { padding-top: 17px; padding-bottom: 17px; border-bottom-color: #f0edf3; }
   .seller-mobile { flex-wrap: wrap; }
   .seller-mobile-amount { margin-left: auto; }
 }
+
+/* Spacious desktop tabs with display typography. */
+.desktop-nav {
+  align-self: center;
+  gap: 12px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+.desktop-nav .nav-tab {
+  position: relative;
+  min-height: 62px;
+  padding: 17px 22px 20px;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: 'Bounded', sans-serif;
+  font-variation-settings: normal;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -.5px;
+  box-shadow: none;
+  transition: color 150ms ease, background 150ms ease;
+}
+.desktop-nav .nav-tab svg { display: none; }
+.desktop-nav .nav-tab:hover:not(:disabled) {
+  background: transparent;
+  color: var(--plum);
+}
+.desktop-nav .nav-tab.active {
+  background: transparent;
+  color: var(--plum);
+  box-shadow: none;
+}
+.desktop-nav .nav-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 28%;
+  right: 28%;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--plum);
+}
+.desktop-nav .nav-tab:focus-visible {
+  outline: 2px solid var(--plum);
+  outline-offset: 3px;
+}
+@media (min-width: 701px) and (max-width: 1200px) {
+  .desktop-nav { gap: 6px; }
+  .desktop-nav .nav-tab { min-height: 56px; padding: 15px 14px 18px; font-size: 16px; }
+}
+
+.overview-subtitle {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.8;
+  color: #8b7a97;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+}
+
+/* Light tonal controls and the original quiet header. */
+.site-header {
+  background: var(--surface-page);
+  border-bottom: 0;
+  box-shadow: none;
+}
+.header-inner { border-bottom: 2px solid #d9cfe3; }
+.filter-control,
+.export-button {
+  background: #faf9fc;
+  border-color: #e0d8e9;
+}
+.filter-control:hover:not(:disabled),
+.export-button:hover:not(:disabled) {
+  background: #f2eef7;
+  border-color: #cbbbd8;
+}
+.region-control select { background: transparent; }
+.filter-control:focus-visible,
+.filter-control:focus-within,
+.export-button:focus-visible {
+  outline: 2px solid #9775a6;
+  outline-offset: 3px;
+}
+
+.category-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; padding: 12px 23px 18px; }
+.category-actions .category-more { margin: 0; }
+.category-search { width: 210px; max-width: 100%; min-height: 40px; padding: 9px 12px; background: #faf9fc; border: 1px solid var(--border); border-radius: 8px; color: inherit; font: inherit; font-size: 12px; }
+.category-search::placeholder { color: var(--text-secondary); }
+.category-search:focus-visible { outline: 2px solid #9775a6; outline-offset: 2px; }
+.category-search-note { padding: 0 23px 14px; margin: 0; color: var(--text-secondary); font-size: 11px; }
