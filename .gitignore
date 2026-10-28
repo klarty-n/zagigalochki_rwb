@@ -8,6 +8,7 @@ data/*.csv
 # Кэш Python
 __pycache__/
 *.pyc
+.python_deps/
 
 # Локальные настройки редакторов
 .idea/

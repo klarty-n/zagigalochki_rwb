@@ -1,6 +1,6 @@
 {
   "status": "passed",
-  "started_at_utc": "2026-10-28T13:34:11.296784+00:00",
+  "started_at_utc": "2026-10-28T14:16:41.065446+00:00",
   "validation_scope": "team_core",
   "core_queries_verified": true,
   "ready_for_submission": true,
@@ -318,6 +318,6 @@
     "04_repeat_customers": "8eb4231159ddc82839b834c06b210cd55bf3705b0801b3363ac7b7dc9746ebf8",
     "05_category_revenue": "e336cf324672eb397b5cceb58bab57c312667748138ce98206e98fa2621beb10"
   },
-  "local_commit": "5683a2f91e9368150e697e911a9b1bd33a40fb27",
-  "completed_at_utc": "2026-10-28T13:34:37.848151+00:00"
+  "local_commit": "d4e3b5fdad82be5453eff73fc40c4aaae9a7fe8c",
+  "completed_at_utc": "2026-10-28T14:17:06.957547+00:00"
 }

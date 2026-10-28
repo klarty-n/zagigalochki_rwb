@@ -3,7 +3,7 @@ export interface MonthPoint { month: string; orders: number; revenueCents: numbe
 export interface Seller { id: string; city: string; state: string; revenueCents: number; units: number; orders: number }
 export interface Category { id: string | null; name: string; revenueCents: number; share: number }
 export interface Overview {
-  meta: { source: 'demo' | 'core' | 'mart' | 'team-snapshot'; loadedAt: string; currency: 'BRL'; filters: Filters; filtering?: boolean; categoryCount?: number; hasGroupedCategories?: boolean; provenance?: string };
+  meta: { source: 'demo' | 'core' | 'mart' | 'team-snapshot'; loadedAt: string; currency: 'BRL'; filters: Filters; filtering?: boolean; categoryCount?: number; hasGroupedCategories?: boolean; provenance?: string; categoryMartRefreshedAt?: string | null; categoryMartWarning?: boolean };
   kpis: {
     revenueCents: number; averageOrderCents: number | null; customers: number; repeatBuyers: number;
     repeatPercent: number | null; deliveredOrders: number; allOrders: number | null;

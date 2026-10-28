@@ -12,7 +12,8 @@
     "dev:web": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
     "start": "node server/index.mjs",
-    "test": "node --test server/*.test.mjs"
+    "test": "node --test server/*.test.mjs",
+    "benchmark:categories": "node server/benchmark-category.mjs"
   },
   "dependencies": {
     "@fontsource/geologica": "^5.2.0",

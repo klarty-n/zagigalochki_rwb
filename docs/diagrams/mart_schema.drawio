@@ -1,0 +1,169 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" type="device">
+  <diagram id="mart-schema" name="Mart: аналитические витрины">
+    <mxGraphModel grid="1" gridSize="10" page="1" pageWidth="2460" pageHeight="1360" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Модель маркетплейса · схема mart" style="text;html=0;align=left;verticalAlign=middle;fontFamily=Segoe UI;fontSize=38;fontStyle=1;fontColor=#203b55;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="25" width="2320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Обычные VIEW читают core при запросе; сохранённая витрина категорий хранит посчитанные итоги." style="text;html=0;align=left;verticalAlign=middle;fontFamily=Segoe UI;fontSize=21;fontStyle=0;fontColor=#203b55;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="95" width="2320" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="m1" value="факты" source="core" target="base" edge="1" parent="1" style="edgeStyle=segmentEdgeStyle;html=0;rounded=0;endArrow=block;endFill=1;strokeColor=#738fa8;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m2" value="расчёты" source="base" target="reports" edge="1" parent="1" style="edgeStyle=segmentEdgeStyle;html=0;rounded=0;endArrow=block;endFill=1;strokeColor=#738fa8;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m3" value="" source="base" target="cached" edge="1" parent="1" style="edgeStyle=segmentEdgeStyle;html=0;rounded=0;endArrow=block;endFill=1;strokeColor=#738fa8;strokeWidth=2;exitX=0.8;exitY=1;entryX=0.5;entryY=1;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1058" y="740" />
+              <mxPoint x="2145" y="740" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cache-link" value="delivered_items → сохранённые итоги категорий" style="text;html=0;align=center;verticalAlign=middle;fontFamily=Segoe UI;fontSize=18;fontStyle=0;fontColor=#203b55;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="1210" y="690" width="890" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="m4" value="категории" source="cached" target="api" edge="1" parent="1" style="edgeStyle=segmentEdgeStyle;html=0;rounded=0;endArrow=block;endFill=1;strokeColor=#738fa8;strokeWidth=2;exitX=0.5;exitY=1;entryX=0.75;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m5" value="отчёты" source="reports" target="api" edge="1" parent="1" style="edgeStyle=segmentEdgeStyle;html=0;rounded=0;endArrow=block;endFill=1;strokeColor=#738fa8;strokeWidth=2;exitX=0.5;exitY=1;entryX=0.25;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m6" value="свежесть" source="state" target="api" edge="1" parent="1" style="edgeStyle=segmentEdgeStyle;html=0;rounded=0;endArrow=block;endFill=1;strokeColor=#738fa8;strokeWidth=2;exitX=0;exitY=0.5;entryX=1;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="core" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="290" width="510" height="276" as="geometry" />
+        </mxCell>
+        <mxCell id="core_header" value="core · проверенные факты&#10;источник аналитики" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#e5f3ef;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="core">
+          <mxGeometry x="0" y="0" width="510" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="core_row0" value="orders · order_items" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="core">
+          <mxGeometry x="0" y="76" width="510" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="core_row1" value="customers · products · sellers" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="core">
+          <mxGeometry x="0" y="126" width="510" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="core_row2" value="order_address_snapshot" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="core">
+          <mxGeometry x="0" y="176" width="510" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="core_row3" value="order_item_category_snapshot" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="core">
+          <mxGeometry x="0" y="226" width="510" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="base" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="650" y="290" width="510" height="276" as="geometry" />
+        </mxCell>
+        <mxCell id="base_header" value="mart · базовые VIEW&#10;вычисляются из core при чтении" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#e8f0fc;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="base">
+          <mxGeometry x="0" y="0" width="510" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="base_row0" value="order_metrics · 1 строка = заказ" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="base">
+          <mxGeometry x="0" y="76" width="510" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="base_row1" value="delivered_items · 1 строка = проданная единица" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="base">
+          <mxGeometry x="0" y="126" width="510" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="base_row2" value="исторический штат и категория" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="base">
+          <mxGeometry x="0" y="176" width="510" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="base_row3" value="без размножения оплат и отзывов" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="base">
+          <mxGeometry x="0" y="226" width="510" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="reports" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="290" width="530" height="376" as="geometry" />
+        </mxCell>
+        <mxCell id="reports_header" value="mart · отчётные VIEW&#10;готовые формулы без хранения результата" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#eee9f8;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="reports">
+          <mxGeometry x="0" y="0" width="530" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="reports_row0" value="monthly_sales · продажи по месяцам" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="reports">
+          <mxGeometry x="0" y="76" width="530" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="reports_row1" value="seller_monthly_sales · продавцы за месяц" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="reports">
+          <mxGeometry x="0" y="126" width="530" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="reports_row2" value="category_monthly_sales · категории за месяц" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="reports">
+          <mxGeometry x="0" y="176" width="530" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="reports_row3" value="customer_purchases · покупки человека" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="reports">
+          <mxGeometry x="0" y="226" width="530" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="reports_row4" value="repeat_customers · повторные покупки" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="reports">
+          <mxGeometry x="0" y="276" width="530" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="reports_row5" value="sales_kpis · общие показатели" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="reports">
+          <mxGeometry x="0" y="326" width="530" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="cached" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1880" y="290" width="530" height="276" as="geometry" />
+        </mxCell>
+        <mxCell id="cached_header" value="mart.category_sales_cached&#10;MATERIALIZED VIEW · сохранённые итоги" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#fff2d7;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="cached">
+          <mxGeometry x="0" y="0" width="530" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="cached_row0" value="месяц × штат покупателя × категория" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="cached">
+          <mxGeometry x="0" y="76" width="530" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="cached_row1" value="units · число проданных единиц" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="cached">
+          <mxGeometry x="0" y="126" width="530" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="cached_row2" value="revenue · сумма price без доставки" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="cached">
+          <mxGeometry x="0" y="176" width="530" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="cached_row3" value="обновляется после успешной загрузки core" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="cached">
+          <mxGeometry x="0" y="226" width="530" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="note" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="900" width="1090" height="238" as="geometry" />
+        </mxCell>
+        <mxCell id="note_header" value="Чем отличаются два вида витрин?&#10;на одном локальном PostgreSQL" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#e8f0fc;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="note">
+          <mxGeometry x="0" y="0" width="1090" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="note_row0" value="VIEW: SQL выполняется при каждом чтении" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="note">
+          <mxGeometry x="0" y="76" width="1090" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="note_row1" value="MATERIALIZED VIEW: итог хранится заранее" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="note">
+          <mxGeometry x="0" y="130" width="1090" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="note_row2" value="при ошибке refresh старый итог сохраняется" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="note">
+          <mxGeometry x="0" y="184" width="1090" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="api" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="900" width="530" height="238" as="geometry" />
+        </mxCell>
+        <mxCell id="api_header" value="API → дашборд&#10;что видит пользователь" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#e5f3ef;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="api">
+          <mxGeometry x="0" y="0" width="530" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="api_row0" value="категории читает из сохранённой витрины" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="api">
+          <mxGeometry x="0" y="76" width="530" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="api_row1" value="остальные показатели — из обычных VIEW" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="api">
+          <mxGeometry x="0" y="130" width="530" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="api_row2" value="показывает время последнего обновления" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="api">
+          <mxGeometry x="0" y="184" width="530" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="state" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1880" y="900" width="530" height="238" as="geometry" />
+        </mxCell>
+        <mxCell id="state_header" value="mart.refresh_state&#10;служебная таблица" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#fff2d7;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="state">
+          <mxGeometry x="0" y="0" width="530" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="state_row0" value="last_attempt_at · последняя попытка" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="state">
+          <mxGeometry x="0" y="76" width="530" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="state_row1" value="last_success_at · последний успех" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="state">
+          <mxGeometry x="0" y="130" width="530" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="state_row2" value="last_error · ошибка обновления" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="state">
+          <mxGeometry x="0" y="184" width="530" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="footer" value="Витрина хранится в схеме mart той же PostgreSQL. Вторая аналитическая машина пока только в плане масштабирования." style="text;html=0;align=left;verticalAlign=middle;fontFamily=Segoe UI;fontSize=21;fontStyle=0;fontColor=#8a6636;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1270" width="2350" height="44" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -16,7 +16,8 @@ GRANT SELECT ON mart.monthly_sales,mart.seller_monthly_sales,
 -- Backend-only role: contains stable buyer IDs needed for filtered distinct counts.
 GRANT dashboard_reader TO dashboard_api;
 GRANT USAGE ON SCHEMA mart TO dashboard_api;
-GRANT SELECT ON mart.order_metrics,mart.delivered_items TO dashboard_api;
+GRANT SELECT ON mart.order_metrics,mart.delivered_items,
+ mart.category_sales_cached,mart.refresh_state TO dashboard_api;
 -- Read-only operational screens: orders, payment reconciliation and data quality.
 -- No raw access, no write privileges, no superuser rights.
 GRANT USAGE ON SCHEMA core TO dashboard_api;

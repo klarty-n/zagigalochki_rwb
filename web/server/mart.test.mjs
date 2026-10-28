@@ -78,5 +78,8 @@ test('mart mode serves real orders, quality and mart lineage with backend creden
   assert.equal(model.marts.find(e=>e.id==='order_metrics').count,99441);
   assert.ok(model.marts.find(e=>e.id==='monthly_sales').fields.some(f=>f.name==='revenue'));
   assert.ok(model.martRelations.some(r=>r.from==='core.orders'&&r.to==='mart.order_metrics'));
-  assert.equal((await get('/api/overview')).meta.source,'mart');
+  const overview=await get('/api/overview');
+  assert.equal(overview.meta.source,'mart');
+  assert.ok(overview.meta.categoryMartRefreshedAt);
+  assert.equal(overview.meta.categoryMartWarning,false);
 });

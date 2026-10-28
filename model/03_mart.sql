@@ -1,7 +1,7 @@
 \set ON_ERROR_STOP on
 BEGIN;
 CREATE SCHEMA IF NOT EXISTS mart;
-COMMENT ON SCHEMA mart IS 'Dashboard contracts over core. Views show current core snapshot; no stored aggregates.';
+COMMENT ON SCHEMA mart IS 'Dashboard contracts over core; stored category aggregate is defined in 04_cached_mart.sql.';
 
 -- One row per order, including orders without items. No payment/review fanout.
 CREATE OR REPLACE VIEW mart.order_metrics AS

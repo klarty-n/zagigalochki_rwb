@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" type="device">
+  <diagram id="scaling-now-growth" name="Сейчас и при росте">
+    <mxGraphModel grid="1" gridSize="10" page="1" pageWidth="2440" pageHeight="1160" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Масштабирование · сейчас и при росте" style="text;html=0;align=left;verticalAlign=middle;fontFamily=Segoe UI;fontSize=38;fontStyle=1;fontColor=#203b55;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="25" width="2350" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Сегодня всё работает на одной машине. Справа — план разделения ролей после измеренного роста нагрузки." style="text;html=0;align=left;verticalAlign=middle;fontFamily=Segoe UI;fontSize=21;fontStyle=0;fontColor=#203b55;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="95" width="2350" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="now" value="СЕЙЧАС · один компьютер" style="text;html=0;align=left;verticalAlign=middle;fontFamily=Segoe UI;fontSize=27;fontStyle=1;fontColor=#203b55;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="50" y="175" width="1050" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="later" value="ПРИ РОСТЕ · отдельные машины" style="text;html=0;align=left;verticalAlign=middle;fontFamily=Segoe UI;fontSize=27;fontStyle=1;fontColor=#203b55;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="175" width="1100" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="n1" value="SQL" source="n-api" target="n-db" edge="1" parent="1" style="edgeStyle=segmentEdgeStyle;html=0;rounded=0;endArrow=block;endFill=1;strokeColor=#738fa8;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.4;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="g1" value="core" source="g-primary" target="g-analytics" edge="1" parent="1" style="edgeStyle=segmentEdgeStyle;html=0;rounded=0;endArrow=block;endFill=1;strokeColor=#738fa8;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="g2" value="mart" source="g-analytics" target="g-api" edge="1" parent="1" style="edgeStyle=segmentEdgeStyle;html=0;rounded=0;endArrow=block;endFill=1;strokeColor=#738fa8;strokeWidth=2;exitX=1;exitY=0.5;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n-api" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="310" width="460" height="238" as="geometry" />
+        </mxCell>
+        <mxCell id="n-api_header" value="API и дашборд&#10;один процесс приложения" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#e8f0fc;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="n-api">
+          <mxGeometry x="0" y="0" width="460" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="n-api_row0" value="запросы пользователей" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="n-api">
+          <mxGeometry x="0" y="76" width="460" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="n-api_row1" value="выбор периода и региона" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="n-api">
+          <mxGeometry x="0" y="130" width="460" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="n-api_row2" value="отчёты читает из PostgreSQL" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="n-api">
+          <mxGeometry x="0" y="184" width="460" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="n-db" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="650" y="310" width="470" height="238" as="geometry" />
+        </mxCell>
+        <mxCell id="n-db_header" value="PostgreSQL&#10;один экземпляр на компьютере" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#e5f3ef;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="n-db">
+          <mxGeometry x="0" y="0" width="470" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="n-db_row0" value="raw → core → mart VIEW" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="n-db">
+          <mxGeometry x="0" y="76" width="470" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="n-db_row1" value="сохранённый агрегат категорий" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="n-db">
+          <mxGeometry x="0" y="130" width="470" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="n-db_row2" value="резервная копия отдельно" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="n-db">
+          <mxGeometry x="0" y="184" width="470" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="g-primary" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1270" y="310" width="340" height="238" as="geometry" />
+        </mxCell>
+        <mxCell id="g-primary_header" value="Основная PostgreSQL&#10;загрузка и проверка фактов" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#e5f3ef;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="g-primary">
+          <mxGeometry x="0" y="0" width="340" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="g-primary_row0" value="raw → core" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="g-primary">
+          <mxGeometry x="0" y="76" width="340" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="g-primary_row1" value="пишем заказы и снимки истории" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="g-primary">
+          <mxGeometry x="0" y="130" width="340" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="g-primary_row2" value="после успешной загрузки — передача" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="g-primary">
+          <mxGeometry x="0" y="184" width="340" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="g-analytics" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1675" y="310" width="340" height="238" as="geometry" />
+        </mxCell>
+        <mxCell id="g-analytics_header" value="Аналитическая БД&#10;отдельная машина" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#fff2d7;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="g-analytics">
+          <mxGeometry x="0" y="0" width="340" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="g-analytics_row0" value="копия нужных таблиц core" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="g-analytics">
+          <mxGeometry x="0" y="76" width="340" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="g-analytics_row1" value="mart и сохранённые агрегаты" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="g-analytics">
+          <mxGeometry x="0" y="130" width="340" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="g-analytics_row2" value="обновление с меткой времени" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="g-analytics">
+          <mxGeometry x="0" y="184" width="340" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="g-api" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="310" width="330" height="238" as="geometry" />
+        </mxCell>
+        <mxCell id="g-api_header" value="API и дашборд&#10;отдельный сервис" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#e8f0fc;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="g-api">
+          <mxGeometry x="0" y="0" width="330" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="g-api_row0" value="читает аналитику" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="g-api">
+          <mxGeometry x="0" y="76" width="330" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="g-api_row1" value="показывает время обновления" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="g-api">
+          <mxGeometry x="0" y="130" width="330" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="g-api_row2" value="предупреждает при сбое" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="g-api">
+          <mxGeometry x="0" y="184" width="330" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="gate" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="790" width="1060" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="gate_header" value="Когда разделяем роли?&#10;решение принимаем по замерам" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#eee9f8;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="gate">
+          <mxGeometry x="0" y="0" width="1060" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="gate_row0" value="Сначала индексы и оптимизация запросов" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="gate">
+          <mxGeometry x="0" y="76" width="1060" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="gate_row1" value="Проверяем отчёт при ожидаемом числе пользователей" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="gate">
+          <mxGeometry x="0" y="124" width="1060" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="gate_row2" value="Если цель стабильно нарушается — переносим аналитику" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="gate">
+          <mxGeometry x="0" y="172" width="1060" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="backup" value="" style="fillColor=none;strokeColor=#d3dfeb;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="790" width="1060" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="backup_header" value="Защита данных&#10;для обоих вариантов" style="whiteSpace=wrap;html=0;align=center;verticalAlign=middle;fillColor=#fff2d7;strokeColor=#d3dfeb;fontColor=#203b55;fontFamily=Segoe UI;fontSize=20;fontStyle=1;" vertex="1" parent="backup">
+          <mxGeometry x="0" y="0" width="1060" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="backup_row0" value="Резервная копия вне основной БД" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="backup">
+          <mxGeometry x="0" y="76" width="1060" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="backup_row1" value="Пробное восстановление в отдельную базу" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="backup">
+          <mxGeometry x="0" y="124" width="1060" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="backup_row2" value="Реплика не заменяет backup" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=19;" vertex="1" parent="backup">
+          <mxGeometry x="0" y="172" width="1060" height="48" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -63,7 +63,9 @@ def draw_file(stem):
         d.polygon(tri,fill=stroke)
         if c.get('value'):
             mx=(pts[0][0]+pts[-1][0])/2;my=(pts[0][1]+pts[-1][1])/2
-            d.text((mx+5,my-30),c.get('value'),font=fnt(17),fill='#203b55')
+            label=c.get('value')
+            label_width=d.textbbox((0,0),label,font=fnt(17))[2]
+            d.text((mx-label_width/2,my-30),label,font=fnt(17),fill='#203b55')
     # Draw parent table borders, then child headers/rows, then free text.
     vertices=[c for c in cells.values() if c.get('vertex')=='1']
     vertices.sort(key=lambda c: (c.get('parent') not in ('1',None), c.get('id','')))
@@ -102,3 +104,5 @@ def draw_file(stem):
 if __name__=='__main__':
     draw_file('core_history_schema')
     draw_file('history_data_flow')
+    draw_file('scaling_now_growth')
+    draw_file('mart_schema')

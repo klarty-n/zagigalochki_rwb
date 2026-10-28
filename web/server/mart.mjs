@@ -45,15 +45,19 @@ export function createMartProvider(connectionString) {
           FROM mart.delivered_items WHERE ${scope} GROUP BY seller_id,seller_city,seller_state
           ORDER BY SUM(price) DESC,seller_id LIMIT 10`, args)).rows;
         const categories = (await client.query(`SELECT category_code AS id,category AS name,
-          SUM(price)*100 AS "revenueCents",COALESCE(100.0*SUM(price)/NULLIF(SUM(SUM(price)) OVER(),0),0) AS share
-          FROM mart.delivered_items WHERE ${scope} GROUP BY category_code,category
-          ORDER BY SUM(price) DESC,category_code NULLS LAST`, args)).rows;
+          SUM(revenue)*100 AS "revenueCents",COALESCE(100.0*SUM(revenue)/NULLIF(SUM(SUM(revenue)) OVER(),0),0) AS share
+          FROM mart.category_sales_cached WHERE ${scope} GROUP BY category_code,category
+          ORDER BY SUM(revenue) DESC,category_code NULLS LAST`, args)).rows;
+        const freshness = (await client.query(`SELECT last_success_at,last_attempt_at,last_error
+          FROM mart.refresh_state WHERE name='category_sales_cached'`)).rows[0];
         await client.query('COMMIT');
         const numbers = row => Object.fromEntries(Object.entries(row).map(([key,value]) =>
           [key, value === null ? null : Number(value)]));
         const mixed = (row,keys) => ({ ...row, ...numbers(Object.fromEntries(keys.map(k => [k,row[k]]))) });
         return {
           meta: { source: 'mart', loadedAt: new Date().toISOString(), currency: 'BRL', filters,
+            categoryMartRefreshedAt: freshness?.last_success_at?.toISOString() ?? null,
+            categoryMartWarning: Boolean(freshness?.last_error),
             period: { start: '2016-09', end: '2018-08' } },
           kpis: numbers(k), monthly: monthly.map(r => mixed(r,['orders','revenueCents'])),
           sellers: sellers.map(r => mixed(r,['orders','units','revenueCents'])),

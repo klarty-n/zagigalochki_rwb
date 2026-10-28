@@ -111,6 +111,7 @@ http://localhost:8080).
 
 - [Развёртывание PostgreSQL 16 на VPS, перенос базы, доступ и резервные копии](deploy/README.md).
 - [Контракт mart и правила агрегации для дашборда](docs/analytics/mart.md).
-- Витрины: `model/03_mart.sql`; доступ дашборда: `deploy/dashboard_access.sql`.
+- Витрины: `model/03_mart.sql` и сохранённый агрегат `model/04_cached_mart.sql`; доступ дашборда: `deploy/dashboard_access.sql`.
+- [Масштабирование: схема, честный замер, свежесть и пробное восстановление](docs/scaling_defense.md).
 - Запросы для фронтенда: `queries/dashboard.sql`; проверки: `checks/mart.sql`.
 - [Что проверено локально и что ещё не развёрнуто](reports/mart-validation.md).

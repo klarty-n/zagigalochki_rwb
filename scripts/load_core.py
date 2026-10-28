@@ -159,7 +159,17 @@ def load(dsn, report_dir, fail_on_reject=False, application_name="marketplace-co
         print(f"Human-readable report: {path}")
         if failed:
             print(error_message, file=sys.stderr)
-        return 1 if failed else 0
+        if failed:
+            return 1
+        # A successful core publication is followed by an atomic mart publication.
+        # Refresh failure is visible to the caller and the dashboard, while the
+        # previous valid category aggregate stays available.
+        from refresh_category_mart import refresh
+        try:
+            return refresh(dsn)
+        except Exception as exc:
+            print(f'Core load succeeded; mart refresh failed: {exc}', file=sys.stderr)
+            return 1
 
 
 if __name__ == "__main__":
