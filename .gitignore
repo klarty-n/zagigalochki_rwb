@@ -12,3 +12,10 @@ __pycache__/
 # Локальные настройки редакторов
 .idea/
 .vscode/
+
+# Capibara Analytics
+node_modules/
+dist/
+.env
+.env.local
+*.log
