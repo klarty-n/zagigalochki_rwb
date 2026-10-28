@@ -12,3 +12,8 @@ __pycache__/
 # Локальные настройки редакторов
 .idea/
 .vscode/
+
+# Server credentials and backups
+deploy/secrets/
+deploy/backups/
+*.dump

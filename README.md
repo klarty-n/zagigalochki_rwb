@@ -96,3 +96,11 @@ http://localhost:8080).
 
 **Загрузка падает на `ModuleNotFoundError: psycopg2`.** Поставьте вручную:
 `pip install psycopg2-binary`
+
+## Сервер и аналитические витрины
+
+- [Развёртывание PostgreSQL 16 на VPS, перенос базы, доступ и резервные копии](deploy/README.md).
+- [Контракт mart и правила агрегации для дашборда](docs/analytics/mart.md).
+- Витрины: `model/03_mart.sql`; доступ дашборда: `deploy/dashboard_access.sql`.
+- Запросы для фронтенда: `queries/dashboard.sql`; проверки: `checks/mart.sql`.
+- [Что проверено локально и что ещё не развёрнуто](reports/mart-validation.md).
