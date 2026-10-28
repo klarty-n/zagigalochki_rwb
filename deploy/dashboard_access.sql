@@ -17,4 +17,10 @@ GRANT SELECT ON mart.monthly_sales,mart.seller_monthly_sales,
 GRANT dashboard_reader TO dashboard_api;
 GRANT USAGE ON SCHEMA mart TO dashboard_api;
 GRANT SELECT ON mart.order_metrics,mart.delivered_items TO dashboard_api;
+-- Read-only operational screens: orders, payment reconciliation and data quality.
+-- No raw access, no write privileges, no superuser rights.
+GRANT USAGE ON SCHEMA core TO dashboard_api;
+GRANT SELECT ON core.orders,core.customers,core.order_items,core.order_payments,
+ core.order_reviews,core.products,core.sellers,core.categories TO dashboard_api;
+GRANT SELECT ON mart.customer_purchases TO dashboard_api;
 COMMIT;

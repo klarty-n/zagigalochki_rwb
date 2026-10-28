@@ -100,4 +100,4 @@ npm run build
 
 ## Подключение mart
 
-В participant3/analysis добавлен DATA_SOURCE=mart: backend агрегирует SQL из mart и сохраняет JSON-контракт /api/overview, графики и фильтры. Инструкция и права доступа — docs/analytics/mart.md. Пример конфигурации — web/.env.example. Для страниц заказов и качества остаётся DATA_SOURCE=core. Пароли передаются только backend через игнорируемый web/.env.
+В participant3/analysis добавлен DATA_SOURCE=mart: backend агрегирует SQL из mart и сохраняет JSON-контракт /api/overview, графики и фильтры. Инструкция и права доступа — docs/analytics/mart.md. Пример конфигурации — web/.env.example. В режиме mart страницы заказов и качества читают core на backend с кэшем на минуту; модель показывает все три слоя. Пароли передаются только backend через игнорируемый web/.env.

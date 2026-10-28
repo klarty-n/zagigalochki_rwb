@@ -72,7 +72,9 @@ test('API validates inputs and never replaces a failing core provider with demo'
   assert.equal(bad.status, 400);
   const unavailable = await fetch(`${base}/api/overview`);
   assert.equal(unavailable.status, 503);
-  assert.match((await unavailable.json()).error, /core/);
+  const failure = await unavailable.json();
+  assert.match(failure.error, /Не удалось обновить аналитику/);
+  assert.equal(failure.kpis, undefined);
   assert.equal((await fetch(`${base}/api/nonexistent`)).status, 404);
 });
 

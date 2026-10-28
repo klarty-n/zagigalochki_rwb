@@ -50,3 +50,33 @@ test('mart live SQL matches existing core calculations for totals, filters and e
     assert.deepEqual(actual.regions,expected.regions);
   }
 });
+
+test('mart mode serves real orders, quality and mart lineage with backend credentials', {
+  skip: !process.env.MART_TEST_DATABASE_URL,
+}, async t => {
+  const provider = createMartProvider(process.env.DATABASE_URL || process.env.MART_TEST_DATABASE_URL);
+  const server = createApp(provider,'mart').listen(0,'127.0.0.1');
+  await new Promise(r=>server.once('listening',r));
+  t.after(async()=>{await new Promise(r=>server.close(r));await provider.close();});
+  const base=`http://127.0.0.1:${server.address().port}`;
+  const get=async path=>{const response=await fetch(base+path);assert.equal(response.status,200,path);return response.json();};
+  const orders=await get('/api/orders?start=2017-01&end=2017-03&state=SP&pageSize=2');
+  assert.equal(orders.items.length,2);
+  assert.ok(orders.items.every(o=>o.state==='SP'&&o.purchasedAt>='2017-01'&&o.purchasedAt<'2017-04'));
+  const detail=await get(`/api/orders/${orders.items[0].id}`);
+  assert.equal(detail.order.id,orders.items[0].id);
+  assert.ok(detail.items.length>0);
+  assert.ok(Array.isArray(detail.payments)&&Array.isArray(detail.reviews));
+  const quality=await get('/api/quality');
+  assert.equal(quality.orderCount,99441);
+  assert.ok(quality.checks.length>0);
+  const model=await get('/api/model');
+  assert.equal(model.available,true);
+  assert.equal(model.martAvailable,true);
+  assert.equal(model.marts.length,8);
+  assert.equal(model.entities.find(e=>e.id==='orders').count,99441);
+  assert.equal(model.marts.find(e=>e.id==='order_metrics').count,99441);
+  assert.ok(model.marts.find(e=>e.id==='monthly_sales').fields.some(f=>f.name==='revenue'));
+  assert.ok(model.martRelations.some(r=>r.from==='core.orders'&&r.to==='mart.order_metrics'));
+  assert.equal((await get('/api/overview')).meta.source,'mart');
+});

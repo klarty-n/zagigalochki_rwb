@@ -31,7 +31,7 @@ export function createApp(provider, source) {
     } catch (error) {
       if (error instanceof InputError) return res.status(400).json({ error: error.message });
       console.error('[overview]', error.message);
-      return res.status(503).json({ error: 'Не удалось прочитать данные. Проверьте подключение и соответствие схем core/mart контракту команды.' });
+      return res.status(503).json({ error: 'Не удалось обновить аналитику. Повторите запрос через несколько секунд.' });
     }
   });
   const handle = fn => async (req, res) => {
@@ -39,7 +39,7 @@ export function createApp(provider, source) {
     catch (error) {
       if (error instanceof InputError) return res.status(400).json({ error: error.message });
       console.error('[explorer]', error.message);
-      res.status(503).json({ error: 'Источник данных недоступен. Проверьте подключение к core.' });
+      res.status(503).json({ error: 'Источник данных временно недоступен. Повторите запрос через несколько секунд.' });
     }
   };
   app.get('/api/orders', handle(async (req, res) => {
@@ -58,7 +58,8 @@ export function createApp(provider, source) {
   app.get('/api/model', handle(async (_req, res) => {
     // The documented schema remains usable when the database is offline; counts do not.
     const data = await provider.getData().catch(() => null);
-    res.json(modelPayload(data, source));
+    const marts = provider.getMartModel ? await provider.getMartModel().catch(() => null) : null;
+    res.json(modelPayload(data, source, marts));
   }));
   app.use('/api', (_req, res) => res.status(404).json({ error: 'API-маршрут не найден.' }));
   const dist = fileURLToPath(new URL('../dist', import.meta.url));

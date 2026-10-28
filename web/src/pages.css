@@ -273,3 +273,9 @@
   .field-table td { font-size: 10px; }
   .model-boundary { font-size: 11px; }
 }
+
+/* Three database layers remain scrollable inside the model panel. */
+.schema-three-layers { grid-template-columns: minmax(0,1fr) 44px minmax(0,1fr) 44px minmax(0,1fr); }
+.schema-three-layers .schema-node strong { overflow-wrap: anywhere; white-space: normal; }
+.schema-three-layers .mart-node { border-color: #d9b5e7; background: #faf5fd; }
+.entity-heading h2, .entity-relation span { overflow-wrap: anywhere; }

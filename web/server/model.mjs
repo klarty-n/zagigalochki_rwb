@@ -35,7 +35,27 @@ export const relations = [
   { from: 'order_reviews', to: 'orders', label: 'order_id', cardinality: 'N : 1' },
   { from: 'products', to: 'categories', label: 'category_name', cardinality: 'N : 0..1' },
 ];
-export function modelPayload(data, source) {
+// Logical grains and lineage, not foreign-key constraints on SQL views.
+export const martEntities = [
+  {id:'order_metrics',title:'Показатели заказов',grain:'Один заказ, все статусы',key:'order_id',
+   note:'Стоимость товаров, доставка и состав заказа. Заказы без позиций сохраняются.',inputs:['core.orders','core.customers','core.order_items']},
+  {id:'delivered_items',title:'Доставленные товары',grain:'Одна единица товара в доставленном заказе',key:'order_id + order_item_id',
+   note:'Выручка без доставки, продавец, категория и штат покупателя.',inputs:['core.order_items','core.orders','core.customers','core.products','core.sellers','core.categories']},
+  {id:'monthly_sales',title:'Продажи по месяцам',grain:'Один календарный месяц',key:'month',
+   note:'Месяцы без продаж сохранены. Средний чек пустого месяца не определён.',inputs:['mart.order_metrics']},
+  {id:'seller_monthly_sales',title:'Продажи продавцов',grain:'Один продавец за месяц',key:'month + seller_id',
+   note:'Выручка относится только к товарам данного продавца.',inputs:['mart.delivered_items']},
+  {id:'category_monthly_sales',title:'Продажи по категориям',grain:'Одна категория за месяц, включая неизвестную',key:'month + category_code (NULL — без категории)',
+   note:'Неизвестная категория включена в общую выручку.',inputs:['mart.delivered_items']},
+  {id:'customer_purchases',title:'История покупок',grain:'Один уникальный покупатель за всю историю',key:'customer_unique_id',
+   note:'Все статусы заказов; даты первого и последнего оформления.',inputs:['mart.order_metrics']},
+  {id:'repeat_customers',title:'Повторные покупки',grain:'Один общий итог за всю историю',key:'Одна итоговая строка',
+   note:'Доля покупателей с двумя и более заказами. Для периода API пересчитывает показатель по order_metrics.',inputs:['mart.customer_purchases']},
+  {id:'sales_kpis',title:'Показатели продаж',grain:'Один общий итог доставленных заказов с товарами',key:'Одна итоговая строка',
+   note:'Выручка, средний чек, среднее количество строк и единиц в заказе.',inputs:['mart.order_metrics']},
+];
+export function modelPayload(data, source, marts = null) {
+
   const counts = data ? {
     orders: data.orders.length, customers: data.sourceCounts?.customers ?? new Set(data.orders.map(o => o.customerId ?? o.id)).size,
     order_items: data.orders.reduce((n, o) => n + o.items.length, 0),
@@ -44,6 +64,9 @@ export function modelPayload(data, source) {
     products: data.products?.length ?? new Set(data.orders.flatMap(o => o.items.map(i => i.productId))).size,
     sellers: data.sellers.length, categories: data.categories.filter(c => c.id !== null).length,
   } : {};
-  return { source, available: !!data, loadedAt: data?.loadedAt ?? null, contract: 'feature/core-model · 4bc3b28',
+  return { source, available: !!data, loadedAt: data?.loadedAt ?? null, contract: 'core + mart · PostgreSQL 16',
+    martAvailable: marts !== null,
+    marts: martEntities.map(e => ({...e,raw:'',fields:marts?.fields[e.id] ?? [],count:marts?.counts[e.id] ?? null})),
+    martRelations: martEntities.flatMap(e => e.inputs.map(input => ({from:input,to:`mart.${e.id}`,label:'SQL-зависимость',cardinality:'VIEW'}))),
     entities: entities.map(e => ({ ...e, count: counts[e.id] ?? null })), relations };
 }

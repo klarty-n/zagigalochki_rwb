@@ -1,10 +1,13 @@
 import pg from 'pg';
+import { createCoreProvider } from './core.mjs';
+import { martEntities } from './model.mjs';
 import { InputError } from './analytics.mjs';
 
 // All filtering uses parameters. Buyer state is NOT seller state.
 export function createMartProvider(connectionString) {
   if (!connectionString) throw new Error('Для DATA_SOURCE=mart требуется DATABASE_URL.');
   const pool = new pg.Pool({ connectionString, max: 3, connectionTimeoutMillis: 5000 });
+  let details;
   return {
     async getOverview(filters) {
       const client = await pool.connect();
@@ -61,7 +64,27 @@ export function createMartProvider(connectionString) {
         throw error;
       } finally { client.release(); }
     },
-    async getData() { throw new InputError('В режиме mart доступна аналитика. Для заказов и качества выберите DATA_SOURCE=core.'); },
-    close: () => pool.end(),
+    async getData() {
+      details ??= createCoreProvider(connectionString);
+      return details.getData();
+    },
+    async getMartModel() {
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
+        await client.query("SET LOCAL statement_timeout = '15000ms'");
+        // Relation names come exclusively from the code-owned contract, never the request.
+        const counts = await client.query(martEntities.map(e =>
+          `SELECT '${e.id}' AS id, count(*)::int AS count FROM mart.${e.id}`).join(' UNION ALL '));
+        const columns = await client.query(`SELECT table_name,column_name,data_type,is_nullable
+          FROM information_schema.columns WHERE table_schema='mart' ORDER BY table_name,ordinal_position`);
+        await client.query('COMMIT');
+        return { counts: Object.fromEntries(counts.rows.map(r => [r.id,r.count])),
+          fields: Object.fromEntries(martEntities.map(e => [e.id,columns.rows.filter(r => r.table_name===e.id)
+            .map(r => ({name:r.column_name,type:r.data_type,role:'',nullable:r.is_nullable==='YES'}))])) };
+      } catch (error) { await client.query('ROLLBACK').catch(() => {}); throw error; }
+      finally { client.release(); }
+    },
+    close: async () => { await pool.end(); if (details) await details.close(); },
   };
 }
