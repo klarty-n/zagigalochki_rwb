@@ -73,6 +73,8 @@ export function createMartProvider(connectionString) {
       try {
         await client.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
         await client.query("SET LOCAL statement_timeout = '15000ms'");
+        // Counting all eight views at once exceeds small Docker /dev/shm with parallel plans.
+        await client.query('SET LOCAL max_parallel_workers_per_gather = 0');
         // Relation names come exclusively from the code-owned contract, never the request.
         const counts = await client.query(martEntities.map(e =>
           `SELECT '${e.id}' AS id, count(*)::int AS count FROM mart.${e.id}`).join(' UNION ALL '));

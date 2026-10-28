@@ -25,6 +25,15 @@ export const entities = [
   { id: 'categories', raw: 'product_category_translation', title: 'Категории', grain: 'Один исходный португальский код категории', key: 'category_name',
     note: 'Справочник объединяет коды из переводов и товаров. Нет перевода — остаётся исходный код; фиктивного ID для NULL нет.',
     fields: [field('category_name', 'text', 'PK'), field('category_name_english', 'text', '', true)] },
+  { id: 'order_address_snapshot', raw: '', title: 'Адрес заказа', grain: 'Один неизменяемый снимок на заказ', key: 'order_id',
+    note: 'Штат, город и почтовый префикс на момент оформления; переезд не меняет старый заказ.',
+    fields: [field('order_id','text','PK · FK'),field('zip_code_prefix','text','',true),field('city','text','',true),field('state','text','',true)] },
+  { id: 'order_item_category_snapshot', raw: '', title: 'Категория продажи', grain: 'Один неизменяемый снимок на позицию', key: 'order_id + order_item_id',
+    note: 'Исторические продажи остаются в исходной категории после смены категории продавцом.',
+    fields: [field('order_id','text','PK · FK'),field('order_item_id','integer','PK · FK'),field('category_name','text','FK',true)] },
+  { id: 'seller_product_category_history', raw: '', title: 'История категорий', grain: 'Одна версия категории продавца и товара', key: 'seller_id + product_id + valid_from',
+    note: 'Первое состояние из CSV предполагаемое; точные прежние изменения неизвестны.',
+    fields: [field('seller_id','text','PK · FK'),field('product_id','text','PK · FK'),field('valid_from','timestamp','PK'),field('valid_to','timestamp','',true),field('category_name','text','FK',true),field('baseline_inferred','boolean')] },
 ];
 export const relations = [
   { from: 'orders', to: 'customers', label: 'customer_id', cardinality: '1 : 1', note: 'Один ID оформления соответствует одному заказу в текущей модели.' },
@@ -34,13 +43,17 @@ export const relations = [
   { from: 'order_payments', to: 'orders', label: 'order_id', cardinality: 'N : 1' },
   { from: 'order_reviews', to: 'orders', label: 'order_id', cardinality: 'N : 1' },
   { from: 'products', to: 'categories', label: 'category_name', cardinality: 'N : 0..1' },
+  { from: 'order_address_snapshot', to: 'orders', label: 'order_id', cardinality: '1 : 1' },
+  { from: 'order_item_category_snapshot', to: 'order_items', label: 'order_id + order_item_id', cardinality: '1 : 1' },
+  { from: 'seller_product_category_history', to: 'sellers', label: 'seller_id', cardinality: 'N : 1' },
+  { from: 'seller_product_category_history', to: 'products', label: 'product_id', cardinality: 'N : 1' },
 ];
 // Logical grains and lineage, not foreign-key constraints on SQL views.
 export const martEntities = [
   {id:'order_metrics',title:'Показатели заказов',grain:'Один заказ, все статусы',key:'order_id',
-   note:'Стоимость товаров, доставка и состав заказа. Заказы без позиций сохраняются.',inputs:['core.orders','core.customers','core.order_items']},
+   note:'Стоимость товаров, доставка и состав заказа. Заказы без позиций сохраняются.',inputs:['core.orders','core.customers','core.order_items','core.order_address_snapshot']},
   {id:'delivered_items',title:'Доставленные товары',grain:'Одна единица товара в доставленном заказе',key:'order_id + order_item_id',
-   note:'Выручка без доставки, продавец, категория и штат покупателя.',inputs:['core.order_items','core.orders','core.customers','core.products','core.sellers','core.categories']},
+   note:'Выручка без доставки, продавец, категория и штат покупателя.',inputs:['core.order_items','core.orders','core.order_address_snapshot','core.order_item_category_snapshot','core.products','core.sellers','core.categories']},
   {id:'monthly_sales',title:'Продажи по месяцам',grain:'Один календарный месяц',key:'month',
    note:'Месяцы без продаж сохранены. Средний чек пустого месяца не определён.',inputs:['mart.order_metrics']},
   {id:'seller_monthly_sales',title:'Продажи продавцов',grain:'Один продавец за месяц',key:'month + seller_id',
@@ -62,6 +75,8 @@ export function modelPayload(data, source, marts = null) {
     order_payments: data.orders.reduce((n, o) => n + (o.payments?.length ?? 0), 0),
     order_reviews: data.orders.reduce((n, o) => n + (o.reviews?.length ?? 0), 0),
     products: data.products?.length ?? new Set(data.orders.flatMap(o => o.items.map(i => i.productId))).size,
+    order_address_snapshot: data.orders.length,
+    order_item_category_snapshot: data.orders.reduce((n, o) => n + o.items.length, 0),
     sellers: data.sellers.length, categories: data.categories.filter(c => c.id !== null).length,
   } : {};
   return { source, available: !!data, loadedAt: data?.loadedAt ?? null, contract: 'core + mart · PostgreSQL 16',

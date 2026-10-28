@@ -16,21 +16,23 @@ export function createCoreProvider(connectionString) {
       await client.query("SET LOCAL statement_timeout = '15000ms'");
       const orders = await client.query(`
         SELECT o.order_id AS id, to_char(o.order_purchase_at, 'YYYY-MM-DD"T"HH24:MI:SS') AS purchased_at,
-               o.customer_id, o.order_status AS status, c.customer_unique_id AS buyer_id, c.city, c.state,
+               o.customer_id, o.order_status AS status, c.customer_unique_id AS buyer_id, addr.city, addr.state,
                to_char(o.order_approved_at, 'YYYY-MM-DD"T"HH24:MI:SS') AS approved_at,
                to_char(o.delivered_carrier_at, 'YYYY-MM-DD"T"HH24:MI:SS') AS carrier_at,
                to_char(o.delivered_customer_at, 'YYYY-MM-DD"T"HH24:MI:SS') AS delivered_at,
                to_char(o.estimated_delivery_date, 'YYYY-MM-DD') AS estimated_at
         FROM core.orders o
         JOIN core.customers c ON c.customer_id = o.customer_id
+        JOIN core.order_address_snapshot addr ON addr.order_id = o.order_id
       `);
       const items = await client.query(`
-        SELECT i.order_id, i.order_item_id, i.product_id, i.seller_id, p.category_name AS category_id,
+        SELECT i.order_id, i.order_item_id, i.product_id, i.seller_id, snap.category_name AS category_id,
                to_char(i.shipping_limit_at, 'YYYY-MM-DD"T"HH24:MI:SS') AS shipping_limit_at,
                (i.price * 100)::bigint AS price_cents,
                (i.freight_value * 100)::bigint AS freight_cents
         FROM core.order_items i
-        LEFT JOIN core.products p ON p.product_id = i.product_id
+        JOIN core.order_item_category_snapshot snap
+          ON snap.order_id=i.order_id AND snap.order_item_id=i.order_item_id
       `);
       const sellers = await client.query('SELECT seller_id AS id, city, state FROM core.sellers');
       const categories = await client.query(`SELECT category_name AS id,

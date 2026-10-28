@@ -62,3 +62,115 @@ CREATE TABLE IF NOT EXISTS core.order_reviews (
     PRIMARY KEY(review_id, order_id)
 );
 CREATE INDEX IF NOT EXISTS reviews_order_idx ON core.order_reviews(order_id);
+
+-- A buyer may move, but an order's destination is fixed when it is placed.
+CREATE TABLE IF NOT EXISTS core.order_address_snapshot (
+    order_id text PRIMARY KEY REFERENCES core.orders(order_id),
+    zip_code_prefix text, city text, state text
+);
+
+-- Category belongs to a seller/product offer and can change over time.
+-- The initial CSV gives only one observed category; baseline history is inferred.
+CREATE TABLE IF NOT EXISTS core.seller_product_category_history (
+    seller_id text NOT NULL REFERENCES core.sellers(seller_id),
+    product_id text NOT NULL REFERENCES core.products(product_id),
+    valid_from timestamp without time zone NOT NULL,
+    valid_to timestamp without time zone,
+    category_name text REFERENCES core.categories(category_name),
+    baseline_inferred boolean NOT NULL DEFAULT false,
+    PRIMARY KEY (seller_id, product_id, valid_from),
+    CHECK (valid_to IS NULL OR valid_to > valid_from)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS seller_product_category_current_idx
+    ON core.seller_product_category_history(seller_id, product_id) WHERE valid_to IS NULL;
+
+CREATE TABLE IF NOT EXISTS core.order_item_category_snapshot (
+    order_id text NOT NULL,
+    order_item_id integer NOT NULL,
+    category_name text REFERENCES core.categories(category_name),
+    PRIMARY KEY (order_id, order_item_id),
+    FOREIGN KEY (order_id, order_item_id) REFERENCES core.order_items(order_id, order_item_id)
+);
+
+-- Existing deployments: fill once. Later source changes never overwrite a sale.
+INSERT INTO core.order_address_snapshot(order_id, zip_code_prefix, city, state)
+SELECT o.order_id, c.zip_code_prefix, c.city, c.state
+FROM core.orders o JOIN core.customers c USING(customer_id)
+ON CONFLICT (order_id) DO NOTHING;
+
+INSERT INTO core.seller_product_category_history
+    (seller_id, product_id, valid_from, category_name, baseline_inferred)
+SELECT i.seller_id, i.product_id, min(o.order_purchase_at), p.category_name, true
+FROM core.order_items i JOIN core.orders o USING(order_id)
+JOIN core.products p USING(product_id)
+WHERE NOT EXISTS (
+    SELECT 1 FROM core.seller_product_category_history h
+    WHERE h.seller_id=i.seller_id AND h.product_id=i.product_id)
+GROUP BY i.seller_id, i.product_id, p.category_name
+ON CONFLICT DO NOTHING;
+
+INSERT INTO core.order_item_category_snapshot(order_id, order_item_id, category_name)
+SELECT i.order_id, i.order_item_id, p.category_name
+FROM core.order_items i JOIN core.products p USING(product_id)
+ON CONFLICT (order_id, order_item_id) DO NOTHING;
+
+-- Called for future category-change events; event time must be supplied by source.
+CREATE OR REPLACE FUNCTION core.record_seller_product_category_change(
+    p_seller_id text, p_product_id text, p_category_name text,
+    p_effective_at timestamp without time zone
+) RETURNS void LANGUAGE plpgsql AS $$
+DECLARE current_row core.seller_product_category_history%ROWTYPE;
+BEGIN
+    PERFORM pg_advisory_xact_lock(hashtextextended(p_seller_id || ':' || p_product_id, 0));
+    SELECT * INTO current_row FROM core.seller_product_category_history
+    WHERE seller_id=p_seller_id AND product_id=p_product_id AND valid_to IS NULL
+    FOR UPDATE;
+    IF NOT FOUND THEN
+        INSERT INTO core.seller_product_category_history
+          (seller_id,product_id,valid_from,category_name)
+        VALUES (p_seller_id,p_product_id,p_effective_at,p_category_name);
+    ELSIF current_row.category_name IS DISTINCT FROM p_category_name THEN
+        IF p_effective_at <= current_row.valid_from THEN
+            RAISE EXCEPTION 'Category change time must follow current version';
+        END IF;
+        UPDATE core.seller_product_category_history SET valid_to=p_effective_at
+        WHERE seller_id=p_seller_id AND product_id=p_product_id
+          AND valid_from=current_row.valid_from;
+        INSERT INTO core.seller_product_category_history
+          (seller_id,product_id,valid_from,category_name)
+        VALUES (p_seller_id,p_product_id,p_effective_at,p_category_name);
+    END IF;
+END $$;
+
+CREATE OR REPLACE FUNCTION core.capture_order_address() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    INSERT INTO core.order_address_snapshot(order_id,zip_code_prefix,city,state)
+    SELECT NEW.order_id, c.zip_code_prefix,c.city,c.state
+    FROM core.customers c WHERE c.customer_id=NEW.customer_id
+    ON CONFLICT (order_id) DO NOTHING;
+    RETURN NEW;
+END $$;
+DROP TRIGGER IF EXISTS capture_order_address ON core.orders;
+CREATE TRIGGER capture_order_address AFTER INSERT ON core.orders
+FOR EACH ROW EXECUTE FUNCTION core.capture_order_address();
+
+CREATE OR REPLACE FUNCTION core.capture_order_item_category() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE sale_at timestamp without time zone; chosen_category text; matched boolean;
+BEGIN
+    SELECT order_purchase_at INTO sale_at FROM core.orders WHERE order_id=NEW.order_id;
+    SELECT h.category_name, true INTO chosen_category, matched
+    FROM core.seller_product_category_history h
+    WHERE h.seller_id=NEW.seller_id AND h.product_id=NEW.product_id
+      AND h.valid_from<=sale_at AND (h.valid_to IS NULL OR sale_at<h.valid_to)
+    ORDER BY h.valid_from DESC LIMIT 1;
+    IF NOT coalesce(matched,false) THEN
+        SELECT category_name INTO chosen_category FROM core.products WHERE product_id=NEW.product_id;
+    END IF;
+    INSERT INTO core.order_item_category_snapshot(order_id,order_item_id,category_name)
+    VALUES (NEW.order_id,NEW.order_item_id,chosen_category)
+    ON CONFLICT (order_id,order_item_id) DO NOTHING;
+    RETURN NEW;
+END $$;
+DROP TRIGGER IF EXISTS capture_order_item_category ON core.order_items;
+CREATE TRIGGER capture_order_item_category AFTER INSERT ON core.order_items
+FOR EACH ROW EXECUTE FUNCTION core.capture_order_item_category();

@@ -46,6 +46,9 @@ ADAPTER={
  UNION SELECT NULLIF(btrim(product_category_name),'') FROM raw.product_category_translation
  ) AS n LEFT JOIN raw.product_category_translation AS t ON t.product_category_name=n.category_name
  WHERE n.category_name IS NOT NULL""",
+ 'order_item_category_snapshot':"""SELECT i.order_id,NULLIF(btrim(i.order_item_id),'')::integer AS order_item_id,
+ NULLIF(btrim(p.product_category_name),'') AS category_name FROM raw.order_items i
+ JOIN raw.products p ON p.product_id=i.product_id""",
 }
 
 def main():
@@ -73,7 +76,7 @@ def main():
    return r.stdout.strip() if tuples else r.stdout
   def adapt(q):
    if not args.source_reference:return q
-   return re.sub(r'\bcore\.(orders|order_items|customers|products|sellers|categories)\b',
+   return re.sub(r'\bcore\.(order_item_category_snapshot|orders|order_items|customers|products|sellers|categories)\b',
                  lambda m:'('+ADAPTER[m.group(1)]+')',q)
   def scalar(q):return call(adapt(q))
   def check(label,ok):
@@ -89,6 +92,8 @@ def main():
   manifest['database']=call('SELECT current_database()')
   manifest['observed_core_columns']=call("SELECT table_name||'.'||column_name FROM information_schema.columns WHERE table_schema='core' ORDER BY table_name,ordinal_position").splitlines()
   if not args.source_reference:
+   check('order address snapshot: one per order',int(scalar('SELECT count(*) FROM core.order_address_snapshot'))==int(scalar('SELECT count(*) FROM core.orders')))
+   check('item category snapshot: one per item',int(scalar('SELECT count(*) FROM core.order_item_category_snapshot'))==int(scalar('SELECT count(*) FROM core.order_items')))
    missing=[t+'.'+c for t,cols in REQUIRED.items() for c in cols if t+'.'+c not in manifest['observed_core_columns']]
    if missing:raise RuntimeError('Core is not ready. Missing columns: '+', '.join(missing))
   raw_before=snapshot_raw();manifest['raw_snapshot']=raw_before
