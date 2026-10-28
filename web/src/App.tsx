@@ -12,10 +12,10 @@ const initialFilters: Filters = { start: '2016-09', end: '2018-08', state: 'all'
 const tabs = [{ id: 'overview', name: 'Обзор', Icon: BarChart3 }, { id: 'orders', name: 'Заказы', Icon: ShoppingBag },
   { id: 'quality', name: 'Проверки', Icon: ShieldCheck }, { id: 'model', name: 'Модель', Icon: Database }];
 const pageCopy: Record<string, { title: string; subtitle: string; eyebrow: string }> = {
-  overview: { title: 'Обзор аналитики', subtitle: 'Продажи, покупатели и всё, что между ними.', eyebrow: 'МАРКЕТПЛЕЙС · ОБЩАЯ КАРТИНА' },
+  overview: { title: 'Обзор аналитики', subtitle: 'Выручка, спрос и повторные покупки по регионам.', eyebrow: 'МАРКЕТПЛЕЙС · ОБЩАЯ КАРТИНА' },
   orders: { title: 'Заказы', subtitle: 'Каждый заказ — от оформления до вручения.', eyebrow: 'МАРКЕТПЛЕЙС · ДЕТАЛИ ПРОЦЕССА' },
-  quality: { title: 'Качество данных', subtitle: 'Проверяем факты, понимаем ограничения.', eyebrow: 'МАРКЕТПЛЕЙС · ДОВЕРИЕ К ДАННЫМ' },
-  model: { title: 'Модель данных', subtitle: 'От исходных выгрузок к объяснимой аналитике.', eyebrow: 'МАРКЕТПЛЕЙС · АРХИТЕКТУРА' },
+  quality: { title: 'Качество данных', subtitle: 'Контроль полноты, связности и согласованности данных.', eyebrow: 'МАРКЕТПЛЕЙС · ДОВЕРИЕ К ДАННЫМ' },
+  model: { title: 'Модель данных', subtitle: 'Структура заказов, товаров, платежей и покупателей.', eyebrow: 'МАРКЕТПЛЕЙС · АРХИТЕКТУРА' },
 };
 function readRoute() {
   const [path, params = ''] = window.location.hash.replace(/^#\/?/, '').split('?');
@@ -25,28 +25,28 @@ type Explanation = 'revenue' | 'average' | 'customers' | 'repeat' | 'chart' | 's
 const explanations: Record<Explanation, { title: string; lead: string; formula: string; source: string; notes: string[] }> = {
   revenue: { title: 'Товарная выручка', lead: 'Стоимость товаров в доставленных заказах. Доставка в выручку не входит.',
     formula: 'SUM(цена позиции), статус заказа = delivered', source: 'core.orders → core.order_items',
-    notes: ['Период определяется датой оформления заказа, а не датой вручения.', 'Учитываются выбранный период и штат покупателя.', 'Платежи не присоединяются к позициям: это защищает сумму от задвоения.'] },
+    notes: ['Период определяется датой оформления заказа, а не датой вручения.', 'Учитываются выбранный период и штат покупателя.', 'Выручка отражает стоимость товаров; платежи учитываются отдельно.'] },
   average: { title: 'Средний чек заказа', lead: 'Средняя стоимость доставленного заказа с учётом доставки.',
     formula: 'SUM(цена товаров + доставка) / число доставленных заказов с позициями', source: 'core.orders → core.order_items',
-    notes: ['Сначала собираем сумму каждого заказа, затем считаем среднее.', 'Заказы без позиций не имеют определённого чека и исключаются из знаменателя.', 'Чеки регионов нельзя складывать или усреднять без весов.', 'Единица — одна запись order_items. Товарная строка — уникальная пара товар + продавец внутри заказа; трактовку строк подтверждает аналитик.'] },
+    notes: ['Сначала собираем сумму каждого заказа, затем считаем среднее.', 'Заказы без позиций не имеют определённого чека и исключаются из знаменателя.', 'Средний чек за период рассчитывается по заказам, с учётом их количества.', 'Единица — один товар в заказе. Товарная строка объединяет одинаковый товар одного продавца внутри заказа.'] },
   customers: { title: 'Уникальные покупатели', lead: 'Люди, оформившие хотя бы один заказ в выбранном периоде и регионе.',
     formula: 'COUNT(DISTINCT customer_unique_id)', source: 'core.orders → core.customers',
     notes: ['Учитываем все статусы, включая отменённые заказы.', 'customer_id относится к оформлению, а customer_unique_id — к человеку.', 'Один человек может встретиться в нескольких месяцах. Складывать месячные значения нельзя.'] },
   repeat: { title: 'Повторные покупки', lead: 'Доля покупателей с двумя и более заказами внутри выбранного периода и региона.',
     formula: 'Покупатели с ≥ 2 заказами / все покупатели × 100%', source: 'core.orders → core.customers',
-    notes: ['Учитываем все статусы. Это повторные оформления, а не только повторные доставки.', 'Два заказа считаются в текущем срезе; покупка до выбранного периода не делает покупателя повторным в этом срезе.', 'Контроль задания 3,12% относится ко всей исходной выгрузке, а не к произвольному фильтру.'] },
+    notes: ['Учитываем все статусы. Это повторные оформления, а не только повторные доставки.', 'Два заказа считаются в текущем срезе; покупка до выбранного периода не делает покупателя повторным в этом срезе.', 'Показатель пересчитывается для выбранных периода и региона.'] },
   chart: { title: 'Как рассчитана динамика', lead: 'Выручка и число доставленных заказов показаны одновременно по календарным месяцам оформления.',
     formula: 'Выручка = SUM(price) · Заказы = COUNT(DISTINCT order_id)', source: 'core.orders → core.order_items',
-    notes: ['Розовая линия и левая шкала — выручка BRL; бирюзовый пунктир и правая шкала — заказы. Высота линий не означает равенства денег и количества.', 'Оба ряда учитывают только delivered. Правило подсчёта заказов — рабочее определение команды.', 'Полный период содержит 24 месяца. Месяцы без заказов остаются с нулём.', 'Нажмите на точку, чтобы посмотреть итог месяца и применить его как фильтр.', 'В деморежиме график и все карточки рассчитаны из одних синтетических заказов.'] },
+    notes: ['Выручка показана по левой шкале в BRL, количество заказов — по правой.', 'Оба показателя учитывают только доставленные заказы.', 'Полный период содержит 24 месяца. Месяцы без заказов остаются с нулём.', 'Нажмите на точку, чтобы посмотреть итог месяца и применить его как фильтр.'] },
   sellers: { title: 'Топ-10 продавцов', lead: 'Продавцы с наибольшей товарной выручкой в выбранном срезе.',
     formula: 'SUM(price) по seller_id; только delivered', source: 'core.order_items → core.orders + core.sellers',
     notes: ['Продавцу относится только стоимость его позиций, а не весь чек заказа.', 'Город и штат в таблице относятся к продавцу. Фильтр региона сверху — к покупателю.', 'Один заказ с несколькими продавцами входит в число заказов каждого из них. Эти количества неаддитивны.', 'Топ-10 — часть продавцов, его сумма не обязана равняться выручке площадки.'] },
   categories: { title: 'Выручка по категориям', lead: 'Стоимость доставленных товарных позиций с долей в общей выручке выбранного среза.',
     formula: 'Выручка категории / общая товарная выручка × 100%', source: 'core.order_items → core.products → core.categories',
     notes: ['Нет перевода — показываем исходный код категории. Нет категории — «Не указана».', 'Категории группируются по исходному ключу, а не по отображаемому переводу.', 'Сумма всех категорий, включая «Не указана», равна товарной выручке.', 'Короткий список можно развернуть кнопкой под графиком.'] },
-  source: { title: 'Откуда берутся данные', lead: 'Источник подписан в интерфейсе. SQL-снимок — переданные результаты команды, а не выдуманные заказы.',
-    formula: 'mart → SQL-витрины онлайн · team-snapshot → результаты команды · core → модель · demo → тестовые заказы', source: 'GET /api/overview',
-    notes: ['Демоданные созданы для проверки интерфейса. Они не являются результатами Olist и не подгоняются под контрольные числа.', 'В режиме core сервер читает модель команды в транзакции только для чтения. Обновление снимка — раз в минуту.', 'В режиме mart база считает показатели выбранного периода и штата покупателя, API возвращает готовые агрегаты.', 'При ошибке core или mart показывается ошибка: автоматической подмены реальных данных демонстрационными нет.'] },
+  source: { title: 'Данные и методика', lead: 'Продажи, покупатели и категории рассчитываются на основе единой модели заказов.',
+    formula: 'Исходные данные → единая модель → аналитические показатели', source: 'GET /api/overview',
+    notes: ['Период определяется датой оформления заказа, регион — адресом покупателя.', 'Показатели одного запроса рассчитываются по согласованному состоянию данных.', 'Обновление данных доступно по кнопке в верхней части экрана.', 'При недоступности источника отображается уведомление об ошибке.'] },
 };
 
 function Metric({ label, Icon, value, compact, caption, onInfo }: {
@@ -93,8 +93,8 @@ function Dashboard({ data, showInfo, filters, onMonth }: {
   const categories = allCategories ? data.categories : data.categories.slice(0, 6);
   return <>
     <section className="metrics-grid" aria-label="Ключевые показатели">
-      <Metric label="Товарная выручка" Icon={BarChart3} value={money(k.revenueCents)} compact={shortMoney(k.revenueCents)} caption="Без доставки · delivered" onInfo={() => showInfo('revenue')} />
-      <Metric label="Средний чек" Icon={ShoppingBag} value={k.averageOrderCents === null ? '—' : money(k.averageOrderCents)} caption="С доставкой · delivered" onInfo={() => showInfo('average')} />
+      <Metric label="Товарная выручка" Icon={BarChart3} value={money(k.revenueCents)} compact={shortMoney(k.revenueCents)} caption="Доставленные товары · без доставки" onInfo={() => showInfo('revenue')} />
+      <Metric label="Средний чек" Icon={ShoppingBag} value={k.averageOrderCents === null ? '—' : money(k.averageOrderCents)} caption="Доставленные заказы · с доставкой" onInfo={() => showInfo('average')} />
       <Metric label="Покупатели" Icon={UsersRound} value={integer(k.customers)} caption={data.meta.source === 'team-snapshot' ? 'Вся выгрузка · все статусы' : 'Уникальные · все статусы'} onInfo={() => showInfo('customers')} />
       <Metric label="Повторные покупки" Icon={Repeat2} value={k.repeatPercent === null ? '—' : `${decimal(k.repeatPercent)}%`} caption={`${integer(k.repeatBuyers)} покупателей · ${data.meta.source === 'team-snapshot' ? 'вся выгрузка' : 'все статусы'}`} onInfo={() => showInfo('repeat')} />
     </section>
@@ -116,7 +116,7 @@ function Dashboard({ data, showInfo, filters, onMonth }: {
       </section>
     </div>
     <section className="order-summary" aria-label="Состав заказа"><Package size={17} /><span>В среднем на доставленный заказ</span><strong>{k.averageLines === null ? '—' : decimal(k.averageLines, data.meta.source === 'team-snapshot' ? 6 : 3)} <small>товарной строки</small></strong><strong>{k.averageUnits === null ? '—' : decimal(k.averageUnits, data.meta.source === 'team-snapshot' ? 6 : 3)} <small>единицы</small></strong><InfoButton label="Строки и единицы в заказе" onClick={() => showInfo('average')} /></section>
-    <footer className="page-footer"><span>capibara analytics <span className="footer-dot">·</span> Данные, которые можно объяснить</span><span>{periodLabel(filters.start, filters.end)} · BRL</span></footer>
+    <footer className="page-footer"><span>capibara analytics <span className="footer-dot">·</span> Аналитика продаж маркетплейса</span><span>{periodLabel(filters.start, filters.end)} · BRL</span></footer>
     {sellerDetail && <Dialog title="Продавец" onClose={() => setSellerDetail(null)}><p className="dialog-lead">{sellerDetail.city}, {sellerDetail.state}</p><label className="id-label">Идентификатор продавца</label><p className="id-value">{sellerDetail.id}</p><dl className="detail-stats"><div><dt>Товарная выручка</dt><dd>{money(sellerDetail.revenueCents)}</dd></div><div><dt>Уникальные заказы</dt><dd>{integer(sellerDetail.orders)}</dd></div><div><dt>Заказанные единицы</dt><dd>{integer(sellerDetail.units)}</dd></div></dl><p className="field-hint">Только доставленные заказы в выбранном периоде и регионе покупателя.</p></Dialog>}
   </>;
 }
@@ -137,7 +137,8 @@ export default function App() {
   useEffect(() => { document.title = `${pageCopy[route.page].title} · Capibara Analytics`; }, [route.page]);
   const copy = pageCopy[route.page];
   const snapshot = data?.meta.source === 'team-snapshot';
-  useEffect(() => { if (snapshot && !['overview', 'model'].includes(route.page)) window.location.hash = '/overview'; }, [snapshot, route.page]);
+  const summaryOnly = snapshot || data?.meta.source === 'mart';
+  useEffect(() => { if (summaryOnly && !['overview', 'model'].includes(route.page)) window.location.hash = '/overview'; }, [summaryOnly, route.page]);
   useEffect(() => {
     const abort = new AbortController();
     setLoading(true); setError('');
@@ -150,7 +151,7 @@ export default function App() {
   const filtered = filters.start !== initialFilters.start || filters.end !== initialFilters.end || filters.state !== 'all';
   const navigate = (id: string) => { window.location.hash = `/${id}`; window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const openOrder = (id: string) => { window.location.hash = `/orders?id=${encodeURIComponent(id)}`; };
-  const nav = <>{tabs.map(({ id, name, Icon }) => <button type="button" key={id} className={`nav-tab ${id === route.page ? 'active' : ''}`} aria-current={id === route.page ? 'page' : undefined} disabled={snapshot && !['overview', 'model'].includes(id)} title={snapshot && !['overview', 'model'].includes(id) ? 'Для подробных страниц нужно подключить core' : undefined} onClick={() => navigate(id)}><Icon size={18} strokeWidth={1.65} /><span>{name}</span></button>)}</>;
+  const nav = <>{tabs.map(({ id, name, Icon }) => <button type="button" key={id} className={`nav-tab ${id === route.page ? 'active' : ''}`} aria-current={id === route.page ? 'page' : undefined} disabled={summaryOnly && !['overview', 'model'].includes(id)} title={summaryOnly && !['overview', 'model'].includes(id) ? 'Детализация недоступна в текущем подключении' : undefined} onClick={() => navigate(id)}><Icon size={18} strokeWidth={1.65} /><span>{name}</span></button>)}</>;
   return <>
     <a className="skip-link" href="#main">Перейти к аналитике</a>
     <header className="site-header"><div className="header-inner"><a className="wordmark" href="/" aria-label="Capibara Analytics — главная">capibara <span>analytics</span></a><nav className="desktop-nav" aria-label="Разделы">{nav}</nav></div></header>
@@ -161,9 +162,9 @@ export default function App() {
         {filtered && <button type="button" className="reset-filter" onClick={() => setFilters(initialFilters)}><X size={14} />Сбросить</button>}
         <div className="filter-scope"><SlidersHorizontal size={13} /><span>Регион — по покупателю</span></div>
       </div>}
-      <div className={`source-strip ${snapshot || data?.meta.source === 'core' || data?.meta.source === 'mart' ? 'core' : ''}`}><span className="source-label"><i />{snapshot ? 'SQL-результаты команды' : data?.meta.source === 'mart' ? 'Данные из mart' : data?.meta.source === 'core' ? 'Данные из core' : data?.meta.source === 'demo' ? 'Демонстрационные данные' : 'Загрузка источника…'}</span><span className="source-description">{data?.meta.source === 'mart' ? 'SQL-витрины · период и штат покупателя · актуально на момент запроса' : snapshot ? 'Сохранённый снимок со скриншотов · 28.10.2026 · без онлайн-подключения к БД' : data?.meta.source === 'core' ? 'Снимок модели команды · обновляется раз в минуту' : data?.meta.source === 'demo' ? 'Тестовые заказы для проверки интерфейса.' : ''}</span><span className="currency-note">Валюта: бразильский реал (BRL)</span><button type="button" className="source-info" aria-label="Об источнике данных" onClick={() => setExplanation('source')}><Info size={15} /></button></div>
-      {snapshot && <div className="snapshot-note"><Check size={15} /><span>Контроли сверены: 24 месяца, 13 221 498,11 выручки, средний чек 159,88, 96 096 покупателей. Фильтры недоступны для сохранённого SQL-снимка.</span></div>}
-      <div className="status-region" role="status" aria-live="polite">{loading ? 'Загрузка аналитики…' : snapshot ? 'Показаны SQL-результаты команды. Контрольные суммы сверены.' : error ? '' : `Обновлено. ${integer(data?.kpis.allOrders || 0)} заказов в выбранном срезе.`}</div>
+      <div className={`source-strip ${snapshot || data?.meta.source === 'core' || data?.meta.source === 'mart' ? 'core' : ''}`}><span className="source-label"><i />{snapshot ? 'Сохранённый отчёт' : data?.meta.source === 'mart' ? 'Подключено к базе' : data?.meta.source === 'core' ? 'Подключено к базе' : data?.meta.source === 'demo' ? 'Демонстрационные данные' : 'Загрузка источника…'}</span><span className="source-description">{data?.meta.source === 'mart' ? 'Показатели за выбранный период и регион' : snapshot ? 'Архивный отчёт · 28.10.2026 · без обновления данных' : data?.meta.source === 'core' ? 'Данные обновляются раз в минуту' : data?.meta.source === 'demo' ? 'Тестовый набор · демонстрационный режим' : ''}</span><span className="currency-note">Валюта: бразильский реал (BRL)</span><button type="button" className="source-info" aria-label="Об источнике данных" onClick={() => setExplanation('source')}><Info size={15} /></button></div>
+      {snapshot && <div className="snapshot-note"><Check size={15} /><span>Сохранённый отчёт за полный период. Выбор периода и региона недоступен.</span></div>}
+      <div className="status-region" role="status" aria-live="polite">{loading ? 'Загрузка аналитики…' : snapshot ? 'Показаны Сохранённый отчёт. Контрольные суммы сверены.' : error ? '' : `Обновлено. ${integer(data?.kpis.allOrders || 0)} заказов в выбранном срезе.`}</div>
       {route.page === 'orders' ? <OrdersPage filters={filters} revision={refresh} orderId={route.orderId} openOrder={openOrder} closeOrder={() => { window.location.hash = '/orders'; }} /> : route.page === 'quality' ? <QualityPage revision={refresh} /> : route.page === 'model' ? <ModelPage revision={refresh} /> : error ? <section className="error-panel"><div className="error-symbol"><Database size={25} /></div><h2>Не получилось загрузить аналитику</h2><p>{error}</p><button type="button" className="button primary" onClick={() => setRefresh(n => n + 1)}><RefreshCw size={16} />Повторить</button></section> : !data ? <div className="loading-layout" aria-hidden="true"><div className="metrics-grid">{[0, 1, 2, 3].map(i => <div className="skeleton metric-card" key={i} />)}</div><div className="skeleton chart-skeleton" /></div> : <div className={`dashboard-content ${loading ? 'updating' : ''}`} aria-busy={loading} inert={loading ? true : undefined}>
         {data.kpis.allOrders === 0 && <div className="empty-notice"><SearchX size={18} /><span>За выбранный период заказов нет. Попробуйте другой месяц или регион.</span><button type="button" onClick={() => setFilters(initialFilters)}>Сбросить фильтры</button></div>}
         <Dashboard data={data} showInfo={setExplanation} filters={filters} onMonth={setSelectedMonth} />
@@ -172,6 +173,6 @@ export default function App() {
     <nav className="mobile-nav" aria-label="Мобильные разделы">{nav}</nav>
     {periodOpen && <PeriodDialog filters={filters} onApply={setFilters} onClose={() => setPeriodOpen(false)} />}
     {explanation && <Dialog title={explanations[explanation].title} onClose={() => setExplanation(null)}><p className="dialog-lead">{explanations[explanation].lead}</p><div className="formula-box"><span>Формула</span><p>{explanations[explanation].formula}</p></div><ul className="explanation-list">{explanations[explanation].notes.map(note => <li key={note}><Check size={15} /><span>{note}</span></li>)}</ul><div className="data-origin"><Database size={15} /><span>{explanations[explanation].source}</span></div></Dialog>}
-    {selectedMonth && <Dialog title={monthLabel(selectedMonth.month, true)} onClose={() => setSelectedMonth(null)}><p className="dialog-lead">Результат SQL по доставленным заказам за месяц.</p><dl className="detail-stats"><div><dt>Товарная выручка</dt><dd>{money(selectedMonth.revenueCents)}</dd></div><div><dt>Доставленные заказы</dt><dd>{integer(selectedMonth.orders)}</dd></div></dl>{snapshot ? <p className="field-hint">Сохранённый результат команды. Для пересчёта остальных показателей за этот месяц и просмотра заказов нужно подключить core.</p> : <button type="button" className="button primary wide" onClick={() => { setFilters({ ...filters, start: selectedMonth.month, end: selectedMonth.month }); setSelectedMonth(null); }}>Посмотреть этот месяц<ArrowRight size={16} /></button>}</Dialog>}
+    {selectedMonth && <Dialog title={monthLabel(selectedMonth.month, true)} onClose={() => setSelectedMonth(null)}><p className="dialog-lead">Продажи и доставленные заказы за месяц.</p><dl className="detail-stats"><div><dt>Товарная выручка</dt><dd>{money(selectedMonth.revenueCents)}</dd></div><div><dt>Доставленные заказы</dt><dd>{integer(selectedMonth.orders)}</dd></div></dl>{snapshot ? <p className="field-hint">Данные архивного отчёта. Фильтрация по месяцу недоступна.</p> : <button type="button" className="button primary wide" onClick={() => { setFilters({ ...filters, start: selectedMonth.month, end: selectedMonth.month }); setSelectedMonth(null); }}>Посмотреть этот месяц<ArrowRight size={16} /></button>}</Dialog>}
   </>;
 }

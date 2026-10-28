@@ -37,8 +37,8 @@ export function MonthlyChart({ monthly, onInfo, onMonth }: { monthly: MonthPoint
         </ComposedChart>
       </ResponsiveContainer>
     </div>
-    <p className="chart-scale-note">Две независимые шкалы: сравнивайте динамику, а не высоту линий.</p>
-    <div className="chart-footer"><button type="button" className="text-button" aria-expanded={tableOpen} onClick={() => setTableOpen(!tableOpen)}><Table2 size={14} />{tableOpen ? 'Скрыть таблицу' : 'Показать таблицу'}</button><button type="button" className="button calculation" onClick={onInfo}><CircleHelp size={16} />Как рассчитано?</button></div>
+    <p className="chart-scale-note">Выручка — BRL · заказы — шт.</p>
+    <div className="chart-footer"><button type="button" className="text-button" aria-expanded={tableOpen} onClick={() => setTableOpen(!tableOpen)}><Table2 size={14} />{tableOpen ? 'Скрыть таблицу' : 'Показать таблицу'}</button><button type="button" className="button calculation" onClick={onInfo}><CircleHelp size={16} />Методика расчёта</button></div>
     {tableOpen && <div className="table-scroll monthly-table"><table><caption className="sr-only">Выручка и заказы по месяцам</caption><thead><tr><th>Месяц</th><th className="number">Заказы</th><th className="number">Выручка, BRL</th><th><span className="sr-only">Действие</span></th></tr></thead><tbody>{monthly.map(point => <tr key={point.month}><td>{monthLabel(point.month, true)}</td><td className="number">{integer(point.orders)}</td><td className="number">{decimal(point.revenueCents / 100)}</td><td><button type="button" className="icon-button" aria-label={`Открыть ${monthLabel(point.month, true)}`} onClick={() => onMonth(point)}><ArrowUpRight size={16} /></button></td></tr>)}</tbody></table></div>}
   </section>;
 }
