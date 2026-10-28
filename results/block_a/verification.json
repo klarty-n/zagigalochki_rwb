@@ -1,0 +1,302 @@
+{
+  "status": "passed",
+  "started_at_utc": "2026-10-28T10:53:18.226177+00:00",
+  "validation_scope": "team_core",
+  "core_queries_verified": true,
+  "ready_for_submission": true,
+  "checks": [
+    {
+      "name": "orders: unique keys",
+      "passed": true
+    },
+    {
+      "name": "order_items: unique keys",
+      "passed": true
+    },
+    {
+      "name": "customers: unique keys",
+      "passed": true
+    },
+    {
+      "name": "products: unique keys",
+      "passed": true
+    },
+    {
+      "name": "sellers: unique keys",
+      "passed": true
+    },
+    {
+      "name": "categories: unique keys",
+      "passed": true
+    },
+    {
+      "name": "orders: required values",
+      "passed": true
+    },
+    {
+      "name": "order_items: required values",
+      "passed": true
+    },
+    {
+      "name": "customers: required values",
+      "passed": true
+    },
+    {
+      "name": "orders -> customers: no orphans",
+      "passed": true
+    },
+    {
+      "name": "order_items -> orders: no orphans",
+      "passed": true
+    },
+    {
+      "name": "order_items -> products: no orphans",
+      "passed": true
+    },
+    {
+      "name": "order_items -> sellers: no orphans",
+      "passed": true
+    },
+    {
+      "name": "products -> categories: no orphans",
+      "passed": true
+    },
+    {
+      "name": "delivered: all have items",
+      "passed": true
+    },
+    {
+      "name": "orders: source rows preserved",
+      "passed": true
+    },
+    {
+      "name": "order_items: source rows preserved",
+      "passed": true
+    },
+    {
+      "name": "customers: source rows preserved",
+      "passed": true
+    },
+    {
+      "name": "products: source rows preserved",
+      "passed": true
+    },
+    {
+      "name": "sellers: source rows preserved",
+      "passed": true
+    },
+    {
+      "name": "price: source sum preserved",
+      "passed": true
+    },
+    {
+      "name": "freight_value: source sum preserved",
+      "passed": true
+    },
+    {
+      "name": "Q1: exactly requested columns",
+      "passed": true
+    },
+    {
+      "name": "Q1: 24 months",
+      "passed": true
+    },
+    {
+      "name": "Q1: full ordered calendar",
+      "passed": true
+    },
+    {
+      "name": "Q1: one zero revenue month",
+      "passed": true
+    },
+    {
+      "name": "Q1: November preserved",
+      "passed": true
+    },
+    {
+      "name": "Q1: reference sum",
+      "passed": true
+    },
+    {
+      "name": "Q1: delivered order count",
+      "passed": true
+    },
+    {
+      "name": "Q2: exactly ten sellers",
+      "passed": true
+    },
+    {
+      "name": "Q2: leader amount",
+      "passed": true
+    },
+    {
+      "name": "Q2: descending revenue",
+      "passed": true
+    },
+    {
+      "name": "Q3: one row",
+      "passed": true
+    },
+    {
+      "name": "Q3: order-level check",
+      "passed": true
+    },
+    {
+      "name": "Q3: units >= distinct product-seller lines",
+      "passed": true
+    },
+    {
+      "name": "Q4: one row",
+      "passed": true
+    },
+    {
+      "name": "Q4: people",
+      "passed": true
+    },
+    {
+      "name": "Q4: repeat people",
+      "passed": true
+    },
+    {
+      "name": "Q4: repeat percent",
+      "passed": true
+    },
+    {
+      "name": "Q5: categories",
+      "passed": true
+    },
+    {
+      "name": "Q5: leading amount",
+      "passed": true
+    },
+    {
+      "name": "Q5: full amount",
+      "passed": true
+    },
+    {
+      "name": "Q5: Unknown included",
+      "passed": true
+    },
+    {
+      "name": "Q5: rounded shares near 100",
+      "passed": true
+    },
+    {
+      "name": "Q1: independent raw sum",
+      "passed": true
+    },
+    {
+      "name": "raw unchanged",
+      "passed": true
+    }
+  ],
+  "server_version": "16.15",
+  "database": "marketplace",
+  "observed_core_columns": [
+    "categories.category_name",
+    "categories.category_name_english",
+    "customers.customer_id",
+    "customers.customer_unique_id",
+    "customers.zip_code_prefix",
+    "customers.city",
+    "customers.state",
+    "order_items.order_id",
+    "order_items.order_item_id",
+    "order_items.product_id",
+    "order_items.seller_id",
+    "order_items.shipping_limit_at",
+    "order_items.price",
+    "order_items.freight_value",
+    "order_payments.order_id",
+    "order_payments.payment_sequential",
+    "order_payments.payment_type",
+    "order_payments.payment_installments",
+    "order_payments.payment_value",
+    "order_reviews.review_id",
+    "order_reviews.order_id",
+    "order_reviews.review_score",
+    "order_reviews.comment_title",
+    "order_reviews.comment_message",
+    "order_reviews.review_created_at",
+    "order_reviews.review_answered_at",
+    "orders.order_id",
+    "orders.customer_id",
+    "orders.order_status",
+    "orders.order_purchase_at",
+    "orders.order_approved_at",
+    "orders.delivered_carrier_at",
+    "orders.delivered_customer_at",
+    "orders.estimated_delivery_date",
+    "products.product_id",
+    "products.category_name",
+    "products.name_length",
+    "products.description_length",
+    "products.photos_qty",
+    "products.weight_g",
+    "products.length_cm",
+    "products.height_cm",
+    "products.width_cm",
+    "sellers.seller_id",
+    "sellers.zip_code_prefix",
+    "sellers.city",
+    "sellers.state"
+  ],
+  "raw_snapshot": {
+    "orders": {
+      "rows": 99441,
+      "digest": "8be4ba56cb4d1b29bc85b291ae8c1b01"
+    },
+    "order_items": {
+      "rows": 112650,
+      "digest": "e79ab8cb18e5c79eed9f3eeddad92877"
+    },
+    "order_payments": {
+      "rows": 103886,
+      "digest": "31f86b36dbf72d066ab1a1e37dd547a9"
+    },
+    "order_reviews": {
+      "rows": 99224,
+      "digest": "d60542742063fb2ff4cd7899f2112557"
+    },
+    "products": {
+      "rows": 32951,
+      "digest": "798b275838d5630e1b65a2732e03a7bb"
+    },
+    "sellers": {
+      "rows": 3095,
+      "digest": "35b0899f33a336c69f2450614258c091"
+    },
+    "customers": {
+      "rows": 99441,
+      "digest": "db9bea440a018e43b59c8a7115bf9cbf"
+    },
+    "product_category_translation": {
+      "rows": 71,
+      "digest": "ba873d0cf24a1ac137e77ba0f1a4efff"
+    }
+  },
+  "query_sha256": {
+    "01_monthly_revenue": "b22132cd963c6fcb40a55a952729b31576fcb59e57ba19d8f45efe74a8254b51",
+    "02_top_sellers": "5ad18b2a2b6c1c30e0aa8713cef7132eb4df21d79f2823db1222f9461f701900",
+    "03_average_order": "6ea78151ba8cf345d0848c22fd5bdc275d2420cc95176ed86f0d627551d69770",
+    "04_repeat_customers": "d063987714ae997e6aa7ed86717ac820dde1968f2f1e59878d84661f1969eea9",
+    "05_category_revenue": "c13401ac76e898e14ac090c537602f717afc9ffaf8a0b0961d4798dfd17bbbf8"
+  },
+  "runner_sha256": "b8bd229dc1ade9a5fee89b3ae5a1d6e8b6c383f8c692b853d64c43491e4701f6",
+  "output_rows": {
+    "01_monthly_revenue": 24,
+    "02_top_sellers": 10,
+    "03_average_order": 1,
+    "04_repeat_customers": 1,
+    "05_category_revenue": 74
+  },
+  "results_sha256": {
+    "01_monthly_revenue": "fb98222f38195170a2788f85c7f34f2f374a0a4405db6ccf57a0c73e0a4ac22a",
+    "02_top_sellers": "15b4420d68f0c15c6cf96910e58223468ec4a5b0f5cc0c5480c9cbfac294718e",
+    "03_average_order": "20c35e77dd473a1311c03804540691e21e75961458a63692a27b00486220bd7c",
+    "04_repeat_customers": "1170d6a92a03384df4af6ac5b306b8ae4adaab07320abffcb8bdf399db9eb43a",
+    "05_category_revenue": "42b976b81da056ea2b48b4b59c0b8f84ff77e5e9cd4cfb44eea6f42bffc15959"
+  },
+  "local_commit": "f3d967d49e95936fe42f56ab71c8693af21746c7",
+  "completed_at_utc": "2026-10-28T10:53:28.105141+00:00"
+}
