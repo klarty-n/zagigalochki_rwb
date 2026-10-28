@@ -3,6 +3,7 @@
 import csv
 from collections import Counter, defaultdict
 from decimal import Decimal
+from datetime import datetime
 from pathlib import Path
 
 
@@ -124,3 +125,40 @@ line_units = defaultdict(set)
 for row in items:
     line_units[row["order_id"]].add((row["product_id"], row["seller_id"], row["price"], row["freight_value"]))
 print("orders.repeat_item_signature", sum(len(line_units[oid]) < n for oid, n in Counter(row["order_id"] for row in items).items()))
+
+# Quality warnings preserve the original records; they are not deletion rules.
+print("reviews.creation_timestamp_has_time", sum(
+    datetime.fromisoformat(row["review_creation_date"]).time() != datetime.min.time()
+    for row in reviews if row["review_creation_date"].strip()))
+print("orders.estimated_delivery_has_time", sum(
+    datetime.fromisoformat(row["order_estimated_delivery_date"]).time() != datetime.min.time()
+    for row in orders if row["order_estimated_delivery_date"].strip()))
+for label, earlier, later in (
+    ("carrier_before_purchase", "order_delivered_carrier_date", "order_purchase_timestamp"),
+    ("carrier_before_approval", "order_delivered_carrier_date", "order_approved_at"),
+    ("delivered_before_carrier", "order_delivered_customer_date", "order_delivered_carrier_date"),
+):
+    print(label, sum(bool(row[earlier] and row[later]) and
+                     datetime.fromisoformat(row[earlier]) < datetime.fromisoformat(row[later])
+                     for row in orders))
+
+totals_by_order = defaultdict(Decimal)
+paid_by_order = defaultdict(Decimal)
+for row in items:
+    totals_by_order[row["order_id"]] += item_amount(row)
+for row in payments:
+    paid_by_order[row["order_id"]] += Decimal(row["payment_value"])
+observed_differences = [totals_by_order[oid] - paid_by_order[oid]
+                        for oid, status in status_by_order.items()
+                        if status == "delivered" and oid in paid_by_order
+                        and totals_by_order[oid] != paid_by_order[oid]]
+print("delivered.observed_payment_mismatches", len(observed_differences),
+      "difference", sum(observed_differences, Decimal(0)))
+print("delivered.observed_payment_difference_le_001", sum(
+    abs(value) <= Decimal("0.01") for value in observed_differences))
+print("payments.zero_installments", sum(row["payment_installments"] == "0" for row in payments))
+print("payments.zero_value", sum(Decimal(row["payment_value"]) == 0 for row in payments))
+print("payments.undefined_type", sum(row["payment_type"] == "not_defined" for row in payments))
+print("items.zero_freight", sum(Decimal(row["freight_value"]) == 0 for row in items))
+print("products.zero_weight", sum(row["product_weight_g"].strip() != "" and
+                                  Decimal(row["product_weight_g"]) == 0 for row in products))

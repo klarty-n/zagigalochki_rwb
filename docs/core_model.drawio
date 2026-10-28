@@ -250,7 +250,7 @@
         <mxCell id="order_reviews_row4" value="comment_message : text ?" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=21;" vertex="1" parent="order_reviews">
           <mxGeometry x="0" y="228" width="500" height="38" as="geometry" />
         </mxCell>
-        <mxCell id="order_reviews_row5" value="review_created_on : date" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=21;" vertex="1" parent="order_reviews">
+        <mxCell id="order_reviews_row5" value="review_created_at : timestamp" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#ffffff;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=21;" vertex="1" parent="order_reviews">
           <mxGeometry x="0" y="266" width="500" height="38" as="geometry" />
         </mxCell>
         <mxCell id="order_reviews_row6" value="review_answered_at : timestamp" style="whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#f3f7fa;strokeColor=none;fontColor=#203b55;fontFamily=Segoe UI;fontSize=21;" vertex="1" parent="order_reviews">
